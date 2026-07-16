@@ -28,8 +28,8 @@ Treat every printed token as context cost. Harnesses may truncate, compact, or c
 
 ## Tier 3 — Trim the code after correctness (40% fewer command tokens in one test)
 
-- **Prefer a shell one-liner** for straightforward search/count/filter/aggregate tasks when it preserves semantics. Python may be faster or safer for complex parsing, grouping, or cross-platform behavior.
-- **Delete ceremony only when failure is cheap and obvious:** skip `argparse`, `main()`, docstrings, and defensive scaffolding for genuinely disposable commands, but retain error handling or comments when they protect correctness or prevent excessive failure output.
+- **Default to a bash command over Python.** For search/count/filter/aggregate, reach for `grep`/`rg`/`awk`/`jq`/`find`/`sort`/`uniq`/`wc` first — if a shell one-liner does the job while preserving semantics, use it. Only fall back to Python when the task genuinely needs it: complex parsing, multi-key grouping, quoted-CSV, or cross-platform behavior a one-liner can't handle safely.
+- **For throwaway Python, skip the ceremony — readability is not a goal for one-off code.** No comments, no docstrings, no `argparse` (use `sys.argv`), no `main()`/`if __name__`, no try/except (a traceback is acceptable for a disposable script). Add any of these back only if the script will live on or if error handling actually protects correctness or prevents a flood of failure output.
 - **Remove unnecessary intermediate variables**; keep variables that clarify semantics or prevent repeated work.
 - **1-token names, not 1-char golf.** `count` and `c` both cost 1 token; keep normal spacing. Golfing saves characters, not tokens, and hurts correctness review.
 - **Do not infer speed from brevity.** The validation's shorter `awk` command used 40% fewer command tokens but ran 3.29× slower than its Python baseline.

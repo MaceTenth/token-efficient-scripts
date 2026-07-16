@@ -1,7 +1,7 @@
 {
   "name": "token-efficient-scripts",
   "displayName": "Token-Efficient Scripts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Write throwaway bash/python for one-off file & data tasks so they cost minimal tokens and run fast. Bundles the skill, a /bench command that re-runs the benchmark and logs new findings, and a stop hook.",
   "author": { "name": "MaceTenth", "url": "https://github.com/MaceTenth" },
   "license": "MIT",
