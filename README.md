@@ -8,6 +8,8 @@
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![Self-benchmarking](https://img.shields.io/badge/self--benchmarking-weekly-brightgreen)
 
+**[🎞️ View the interactive slide →](https://macetenth.github.io/token-efficient-scripts/slide.html)**
+
 </div>
 
 > For one-off shell/python that searches, counts, filters, or aggregates data, the token bill is dominated by **what the command prints back into context** — not the code. Optimize output first, data flow second, code last.
@@ -90,7 +92,7 @@ All optimized commands were verified to return the **same answer** as their base
 
 </details>
 
-> 📊 Full run log (append-only, updated weekly): [`benchmark-findings.md`](plugins/token-efficient-scripts/skills/token-efficient-scripts/references/benchmark-findings.md) · one-slide explainer: [`slide.html`](slide.html)
+> 📊 Full run log (append-only, updated weekly): [`benchmark-findings.md`](plugins/token-efficient-scripts/skills/token-efficient-scripts/references/benchmark-findings.md) · one-slide explainer: **[live slide](https://macetenth.github.io/token-efficient-scripts/slide.html)** ([source](slide.html))
 
 ---
 
