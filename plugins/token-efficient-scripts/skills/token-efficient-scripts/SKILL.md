@@ -7,6 +7,14 @@ description: Write throwaway bash/python commands used by Codex-, Claude-, or si
 
 For agent-written one-off scripts, context use is often dominated by **output tokens** (what the command returns to the harness), not the code. Optimize in this order. A 10-task validation found the same answer in every experiment, with a 90.4% mean output reduction across seven output-focused tasks. See [references/benchmark-findings.md](references/benchmark-findings.md) when evaluating the evidence or quoting results.
 
+## Tool selection order (decide this first)
+
+1. **Native Claude Code tool** if one fits — **Grep** (content search), **Glob** (find files by name), **Read**, **Edit**, **Write**. They are output-capped and cross-platform — they work on native Windows without Git Bash, where the harness falls back to PowerShell and shell `grep`/`find` don't exist. Do **not** shell out to `grep`/`find`/`cat`/`sed` when a native tool covers the job.
+2. **Bash** for what the native tools don't do — aggregation and transforms: counts, sums, group-by, `awk`, `jq`, multi-stage pipelines.
+3. **Python** only when a shell one-liner can't do it cleanly — complex/quoted-CSV parsing, multi-key grouping, or cross-platform logic.
+
+Then apply the tiers below to whatever you write.
+
 ## Tier 1 — Control output (40.6–99.999% measured; the dominant lever)
 
 Treat every printed token as context cost. Harnesses may truncate, compact, or cache tool output differently, but unbounded output can still dwarf a short command.
@@ -28,7 +36,7 @@ Treat every printed token as context cost. Harnesses may truncate, compact, or c
 
 ## Tier 3 — Trim the code after correctness (40% fewer command tokens in one test)
 
-- **Default to a bash command over Python.** For search/count/filter/aggregate, reach for `grep`/`rg`/`awk`/`jq`/`find`/`sort`/`uniq`/`wc` first — if a shell one-liner does the job while preserving semantics, use it. Only fall back to Python when the task genuinely needs it: complex parsing, multi-key grouping, quoted-CSV, or cross-platform behavior a one-liner can't handle safely.
+- **Default to bash over Python** for the aggregation/transform work that has no native tool — `awk`, `jq`, `sort`, `uniq`, `wc`, counts, sums, group-by. (Content search and file-finding go to the native **Grep**/**Glob** tools, not shell `grep`/`find` — see Tool selection order above.) Fall back to Python only when a one-liner can't do it cleanly: complex/quoted-CSV parsing, multi-key grouping, or cross-platform logic.
 - **For throwaway Python, skip the ceremony — readability is not a goal for one-off code.** No comments, no docstrings, no `argparse` (use `sys.argv`), no `main()`/`if __name__`, no try/except (a traceback is acceptable for a disposable script). Add any of these back only if the script will live on or if error handling actually protects correctness or prevents a flood of failure output.
 - **Remove unnecessary intermediate variables**; keep variables that clarify semantics or prevent repeated work.
 - **1-token names, not 1-char golf.** `count` and `c` both cost 1 token; keep normal spacing. Golfing saves characters, not tokens, and hurts correctness review.
@@ -65,6 +73,8 @@ Ten deterministic throwaway tasks were tested on Darwin arm64. Every optimized c
 Interpret token counts as directional: the benchmark used `cl100k_base` for continuity with the original measurements, not the private tokenizer or billing behavior of every current agent harness. Do not turn these measurements into a universal monthly cost claim without a representative workload, current pricing, and harness-specific accounting. Read [references/benchmark-findings.md](references/benchmark-findings.md) for the full experiment table, methodology, and limitations.
 
 ## Cheat sheet
+
+For plain content search or file-finding, prefer the native **Grep**/**Glob** tools; the rows below are for the data work that has no native tool.
 
 | Task | Instead of Python | Use |
 |---|---|---|
