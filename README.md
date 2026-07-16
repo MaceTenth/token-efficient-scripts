@@ -137,6 +137,7 @@ slide.html                           # one-slide explainer
 
 ## Notes
 
+- **Platform:** the bash one-liners need a POSIX shell + coreutils — macOS, Linux, WSL, or Windows with Git Bash. On native Windows without Git Bash (where Claude Code falls back to the PowerShell tool) they won't run — use Python or PowerShell equivalents there. The token-efficiency *principles* (return the answer, cap output, filter early) apply on any shell.
 - Token counts use `cl100k` (tiktoken) if installed, else a `chars/4` proxy — figures are approximate; the percentages and the ordering of levers are the robust findings.
 - The plugin cache is read-only after install; runtime writes go to `${CLAUDE_PLUGIN_DATA}`, never into the plugin tree.
 
