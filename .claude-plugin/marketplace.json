@@ -1,0 +1,12 @@
+{
+  "name": "macetenth-plugins",
+  "owner": { "name": "MaceTenth" },
+  "description": "Claude Code plugins.",
+  "plugins": [
+    {
+      "name": "token-efficient-scripts",
+      "source": "./plugins/token-efficient-scripts",
+      "description": "Minimal-token throwaway bash/python for one-off file & data tasks, with a self-benchmarking /bench command."
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+<style>
+  :root{
+    --bg:#F2F4F1; --surface:#FFFFFF; --surface-2:#F7F9F6;
+    --ink:#131D18; --muted:#586A61; --faint:#8A9A90;
+    --line:#DDE4DF; --line-strong:#C6D0C9;
+    --save:#0B7A4F; --save-soft:#E2F1EA;
+    --waste:#B8420B; --waste-soft:#F6E7DD;
+    --accent:#0B7A4F;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0A0F0C; --surface:#111815; --surface-2:#0E1411;
+      --ink:#E9EFEA; --muted:#94A69B; --faint:#61756A;
+      --line:#212C26; --line-strong:#2E3B33;
+      --save:#34D399; --save-soft:#0F241B;
+      --waste:#FB923C; --waste-soft:#2A160A;
+      --accent:#34D399;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#F2F4F1; --surface:#FFFFFF; --surface-2:#F7F9F6;
+    --ink:#131D18; --muted:#586A61; --faint:#8A9A90;
+    --line:#DDE4DF; --line-strong:#C6D0C9;
+    --save:#0B7A4F; --save-soft:#E2F1EA; --waste:#B8420B; --waste-soft:#F6E7DD; --accent:#0B7A4F;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A0F0C; --surface:#111815; --surface-2:#0E1411;
+    --ink:#E9EFEA; --muted:#94A69B; --faint:#61756A;
+    --line:#212C26; --line-strong:#2E3B33;
+    --save:#34D399; --save-soft:#0F241B; --waste:#FB923C; --waste-soft:#2A160A; --accent:#34D399;
+  }
+
+  *{box-sizing:border-box}
+  .wrap{
+    min-height:100vh; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); display:flex; align-items:center; justify-content:center;
+    padding:clamp(16px,3vw,40px);
+    background-image:linear-gradient(var(--line) 1px,transparent 1px);
+    background-size:100% 34px; background-position:0 -1px;
+  }
+  .slide{
+    width:100%; max-width:1120px; background:var(--surface);
+    border:1px solid var(--line-strong); border-radius:14px;
+    box-shadow:0 1px 0 var(--line), 0 24px 60px -30px rgba(0,0,0,.35);
+    overflow:hidden;
+  }
+
+  /* header */
+  .head{padding:clamp(20px,3vw,34px) clamp(22px,3.4vw,40px) 0}
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--accent); display:flex; align-items:center; gap:10px; margin:0 0 14px;
+  }
+  .eyebrow::before{content:"$"; opacity:.6}
+  .eyebrow span{color:var(--faint); letter-spacing:.14em}
+  h1{
+    font-size:clamp(26px,4.2vw,44px); line-height:1.02; letter-spacing:-.02em;
+    font-weight:800; margin:0 0 12px; text-wrap:balance; max-width:16ch;
+  }
+  h1 em{font-style:normal; color:var(--accent)}
+  .thesis{
+    font-size:clamp(14px,1.5vw,17px); color:var(--muted); margin:0; max-width:62ch; line-height:1.5;
+  }
+  .thesis b{color:var(--ink); font-weight:650}
+
+  /* hero collapse bar */
+  .hero{
+    margin:clamp(20px,2.6vw,30px) clamp(22px,3.4vw,40px) 0;
+    border:1px solid var(--line); border-radius:10px; background:var(--surface-2);
+    padding:clamp(16px,2vw,22px);
+  }
+  .hero-top{display:flex; justify-content:space-between; align-items:baseline; gap:16px; margin-bottom:14px; flex-wrap:wrap}
+  .hero-label{font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--faint); text-transform:uppercase}
+  .hero-headline{font-family:var(--mono); font-size:13px; color:var(--muted)}
+  .hero-headline b{color:var(--save)}
+  .bars{display:flex; flex-direction:column; gap:9px}
+  .bar-row{display:grid; grid-template-columns:96px 1fr; align-items:center; gap:12px}
+  .bar-cap{font-family:var(--mono); font-size:11px; color:var(--muted); text-align:right; letter-spacing:.02em}
+  .bar{height:26px; border-radius:5px; display:flex; align-items:center; padding:0 10px;
+    font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums; color:#fff; white-space:nowrap;}
+  .bar.waste{width:100%; background:linear-gradient(90deg,var(--waste),color-mix(in oklab,var(--waste) 78%, #000))}
+  .bar.save{width:4.5%; min-width:64px; background:var(--save); color:#fff}
+  @media (prefers-color-scheme:dark){.bar.save{color:#04120C}}
+  :root[data-theme="dark"] .bar.save{color:#04120C}
+  :root[data-theme="light"] .bar.save{color:#fff}
+
+  /* tiers */
+  .tiers{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+    background:var(--line); margin:clamp(20px,2.6vw,30px) 0 0; border-top:1px solid var(--line);
+  }
+  .tier{background:var(--surface); padding:clamp(16px,2vw,24px) clamp(18px,2.2vw,26px)}
+  .tier-head{display:flex; align-items:center; gap:10px; margin-bottom:12px}
+  .tnum{font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent);
+    border:1px solid var(--accent); border-radius:5px; padding:2px 7px; letter-spacing:.05em}
+  .tname{font-size:15px; font-weight:750; letter-spacing:-.01em}
+  .metric{font-family:var(--mono); font-size:clamp(24px,3vw,32px); font-weight:700;
+    color:var(--ink); letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1; margin-bottom:2px}
+  .metric small{font-size:13px; color:var(--muted); font-weight:600}
+  .metric-label{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--faint); margin-bottom:14px}
+  .why{font-size:13px; line-height:1.5; color:var(--muted); margin:0}
+  .why b{color:var(--ink); font-weight:640}
+  .ex{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:12px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:6px; padding:8px 10px; overflow-x:auto}
+  .ex .g{color:var(--save)} .ex .r{color:var(--waste)} .ex .c{color:var(--faint)}
+
+  /* tier drawings */
+  .tier-art{margin:4px 0 16px; height:74px; border:1px solid var(--line); border-radius:8px;
+    background:var(--surface-2); display:flex; align-items:center; justify-content:center; overflow:hidden}
+  .art-svg{width:100%; height:74px}
+
+  /* cost panel */
+  .cost{padding:clamp(16px,2.2vw,24px) clamp(22px,3.4vw,40px); border-top:1px solid var(--line); background:var(--surface)}
+  .cost-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px}
+  .cost-title{font-size:15px; font-weight:750; letter-spacing:-.01em}
+  .cost-sub{font-family:var(--mono); font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:.1em}
+  .cost-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:9px; overflow:hidden}
+  .cost-cell{background:var(--surface-2); padding:14px 16px}
+  .cost-model{font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:10px; letter-spacing:.02em}
+  .cost-nums{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .cost-without{font-family:var(--mono); font-size:15px; color:var(--waste); text-decoration:line-through; text-decoration-thickness:1.5px; font-variant-numeric:tabular-nums}
+  .cost-arrow{color:var(--faint); font-size:13px}
+  .cost-with{font-family:var(--mono); font-size:24px; font-weight:700; color:var(--save); letter-spacing:-.01em; font-variant-numeric:tabular-nums}
+  .cost-cut{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:6px}
+  .cost-cut b{color:var(--save); font-weight:700}
+  @media (max-width:760px){.cost-grid{grid-template-columns:1fr}}
+
+  /* guardrails */
+  .rails{padding:clamp(15px,2vw,20px) clamp(22px,3.4vw,40px); border-top:1px solid var(--line);
+    display:flex; align-items:center; gap:12px 18px; flex-wrap:wrap; background:var(--surface-2)}
+  .rails-label{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--waste); font-weight:600}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line-strong); border-radius:20px; padding:4px 11px; white-space:nowrap}
+  .foot{padding:12px clamp(22px,3.4vw,40px) 20px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.03em}
+
+  @media (max-width:760px){
+    .tiers{grid-template-columns:1fr}
+    .bar-row{grid-template-columns:80px 1fr}
+  }
+</style>
+
+<div class="wrap">
+  <div class="slide">
+    <div class="head">
+      <p class="eyebrow">token-efficient-scripts <span>// agent harness skill</span></p>
+      <h1>Throwaway commands that return <em>less context</em></h1>
+      <p class="thesis">For one-off shell/python that searches, counts, or aggregates data, context use is often dominated by <b>what the command prints back to the harness</b>. Ten deterministic experiments preserved every answer: optimize output first, data flow second, code last.</p>
+    </div>
+
+    <div class="hero">
+      <div class="hero-top">
+        <span class="hero-label">Measured: same answer, "count ERROR lines in a 120k-line log"</span>
+        <span class="hero-headline">output tokens returned — <b>99.999% cut</b></span>
+      </div>
+      <div class="bars">
+        <div class="bar-row">
+          <span class="bar-cap">rg</span>
+          <div class="bar waste">370,940 tokens &nbsp;— dumps every matching line</div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-cap">rg -c</span>
+          <div class="bar save">3</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tiers">
+      <div class="tier">
+        <div class="tier-head"><span class="tnum">T1</span><span class="tname">Control output</span></div>
+        <div class="tier-art" aria-hidden="true"><svg class="art-svg" viewBox="0 0 150 74" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <g fill="var(--waste)" stroke="none">
+            <circle cx="34" cy="10" r="3"/><circle cx="52" cy="9" r="3"/><circle cx="70" cy="11" r="3"/><circle cx="88" cy="9" r="3"/><circle cx="106" cy="11" r="3"/>
+            <circle cx="44" cy="20" r="3"/><circle cx="62" cy="21" r="3"/><circle cx="80" cy="20" r="3"/><circle cx="98" cy="21" r="3"/><circle cx="116" cy="20" r="3"/>
+          </g>
+          <path d="M22 30 H128 L86 50 V60 H64 V50 Z" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="2"/>
+          <rect x="58" y="63" width="34" height="7" rx="3.5" fill="var(--save)"/>
+        </svg></div>
+        <div class="metric">90.4<small>% avg</small></div>
+        <div class="metric-label">7 output experiments</div>
+        <p class="why"><b>Measured:</b> output reductions ranged from <b>40.64–99.999%</b>; the median was 99.97%. Return the <b>answer</b>, not the data; cap previews; spill complete results to a file when the harness does not need every row.</p>
+        <div class="ex"><span class="r">grep x f</span> &nbsp;<span class="c">→</span>&nbsp; <span class="g">grep -c x f</span><br><span class="c"># need it all? →</span> <span class="g">f&gt;out; head -3 out</span></div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head"><span class="tnum">T2</span><span class="tname">Push filters early</span></div>
+        <div class="tier-art" aria-hidden="true"><svg class="art-svg" viewBox="0 0 150 74" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="27" width="18" height="20" rx="3" fill="none" stroke="var(--muted)" stroke-width="2"/>
+          <line x1="26" y1="37" x2="124" y2="37" stroke="var(--line-strong)" stroke-width="2"/>
+          <g fill="var(--waste)" stroke="none">
+            <circle cx="34" cy="30" r="2.6"/><circle cx="41" cy="42" r="2.6"/><circle cx="40" cy="33" r="2.6"/><circle cx="47" cy="37" r="2.6"/><circle cx="34" cy="44" r="2.6"/>
+          </g>
+          <g stroke="var(--save)" stroke-width="3"><line x1="56" y1="26" x2="56" y2="48"/><line x1="62" y1="26" x2="62" y2="48"/><line x1="68" y1="26" x2="68" y2="48"/></g>
+          <g fill="var(--save)" stroke="none"><circle cx="86" cy="37" r="2.6"/><circle cx="104" cy="37" r="2.6"/></g>
+          <rect x="116" y="27" width="26" height="20" rx="3" fill="none" stroke="var(--muted)" stroke-width="2"/>
+          <path d="M122 33 h14 M122 37 h14 M122 41 h10" stroke="var(--muted)" stroke-width="1.6"/>
+        </svg></div>
+        <div class="metric">1.68<small>×</small></div>
+        <div class="metric-label">measured filter speedup</div>
+        <p class="why"><b>Measured:</b> filtering a 300k-row TSV before sorting ran 1.68× faster. <b>rg -c</b> ran 6.99× faster than grep on one literal-search workload. Tool speed is platform- and workload-dependent.</p>
+        <div class="ex"><span class="r">sort f | awk '$4==500'</span><br><span class="c">→</span> <span class="g">awk '$4==500' f | sort</span></div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head"><span class="tnum">T3</span><span class="tname">Trim the code</span></div>
+        <div class="tier-art" aria-hidden="true"><svg class="art-svg" viewBox="0 0 150 74" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <g stroke="var(--faint)" stroke-width="5">
+            <line x1="22" y1="12" x2="96" y2="12"/><line x1="34" y1="24" x2="114" y2="24"/><line x1="34" y1="36" x2="86" y2="36"/><line x1="22" y1="48" x2="104" y2="48"/>
+          </g>
+          <circle cx="14" cy="52" r="3.5" fill="none" stroke="var(--waste)" stroke-width="2"/>
+          <circle cx="14" cy="60" r="3.5" fill="none" stroke="var(--waste)" stroke-width="2"/>
+          <line x1="17" y1="53" x2="122" y2="9" stroke="var(--waste)" stroke-width="2"/>
+          <line x1="17" y1="59" x2="122" y2="15" stroke="var(--waste)" stroke-width="2"/>
+          <line x1="22" y1="66" x2="92" y2="66" stroke="var(--save)" stroke-width="6"/>
+          <rect x="98" y="61" width="7" height="10" rx="1.5" fill="var(--save)"/>
+        </svg></div>
+        <div class="metric">40<small>%</small></div>
+        <div class="metric-label">fewer command tokens</div>
+        <p class="why"><b>Measured:</b> replacing ceremony-heavy Python with awk cut command tokens by 40%—but ran <b>3.29× slower</b>. Brevity is a context optimization, not a runtime promise; keep structure that protects correctness.</p>
+        <div class="ex"><span class="c"># shell one-liner beats</span><br><span class="c"># a 12-line python walk</span></div>
+      </div>
+    </div>
+
+    <div class="cost">
+      <div class="cost-head">
+        <span class="cost-title">10-task validation</span>
+        <span class="cost-sub">Darwin arm64 · deterministic synthetic data</span>
+      </div>
+      <div class="cost-grid">
+        <div class="cost-cell">
+          <div class="cost-model">CORRECTNESS GATE</div>
+          <div class="cost-nums"><span class="cost-with">10 / 10</span></div>
+          <div class="cost-cut"><b>same task answer</b> · counts, IDs, sums, JSON, previews, stored records, and unique sets verified</div>
+        </div>
+        <div class="cost-cell">
+          <div class="cost-model">ANSWER / PREVIEW / SPILL TASKS</div>
+          <div class="cost-nums"><span class="cost-with">99.16%</span></div>
+          <div class="cost-cut"><b>combined output reduction</b> · excludes the task that genuinely required the complete JSON value</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rails">
+      <span class="rails-label">⚠ guardrails — smaller must equal same</span>
+      <div class="chips">
+        <span class="chip">wc -l counts newlines</span>
+        <span class="chip">cat glues file boundaries</span>
+        <span class="chip">sort before uniq</span>
+        <span class="chip">ties ≠ bug</span>
+        <span class="chip">compare data, not format</span>
+        <span class="chip">shorter ≠ faster</span>
+        <span class="chip">awk CSV only when simple</span>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span>measured across 10 tasks · all answers preserved</span>
+      <span>cl100k token proxy · not a universal billing claim</span>
+    </div>
+  </div>
+</div>
