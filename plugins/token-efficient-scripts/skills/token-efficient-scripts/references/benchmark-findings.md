@@ -128,3 +128,12 @@ Per Run 1's claim assessment, a fixed monthly cost-saving percentage is **not es
 ## Net for Run 2
 
 Reproduces Run 1's core: output control is the dominant lever; compact JSON lands ~50% (not the 50–79% the skill text once claimed); `rg`/pushdown help but by platform-specific margins; code trimming ~25–40% and last-priority. New contribution: two reproducible correctness traps (`wc -l` newlines, `cat` boundary-merge) and the per-turn input re-billing dynamic.
+
+---
+# /bench run — 2026-07-16
+
+token counter: cl100k
+- output-control: grep -> grep -c: 192000 -> 3 (100%), same_answer=True
+- output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
+- code: python walk -> find|wc: 60 -> 41 (32%), same_answer=True
+- predicate pushdown: 1.52x faster
