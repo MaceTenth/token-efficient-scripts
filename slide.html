@@ -146,7 +146,7 @@
 <div class="wrap">
   <div class="slide">
     <div class="head">
-      <p class="eyebrow">token-efficient-scripts <span>// agent harness skill</span></p>
+      <p class="eyebrow">token-efficient-scripts <span>// claude code plugin · self-benchmarking</span></p>
       <h1>Throwaway commands that return <em>less context</em></h1>
       <p class="thesis">For one-off shell/python that searches, counts, or aggregates data, context use is often dominated by <b>what the command prints back to the harness</b>. Ten deterministic experiments preserved every answer: optimize output first, data flow second, code last.</p>
     </div>
@@ -205,7 +205,7 @@
       </div>
 
       <div class="tier">
-        <div class="tier-head"><span class="tnum">T3</span><span class="tname">Trim the code</span></div>
+        <div class="tier-head"><span class="tnum">T3</span><span class="tname">Bash first, then trim</span></div>
         <div class="tier-art" aria-hidden="true"><svg class="art-svg" viewBox="0 0 150 74" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <g stroke="var(--faint)" stroke-width="5">
             <line x1="22" y1="12" x2="96" y2="12"/><line x1="34" y1="24" x2="114" y2="24"/><line x1="34" y1="36" x2="86" y2="36"/><line x1="22" y1="48" x2="104" y2="48"/>
@@ -219,8 +219,8 @@
         </svg></div>
         <div class="metric">40<small>%</small></div>
         <div class="metric-label">fewer command tokens</div>
-        <p class="why"><b>Measured:</b> replacing ceremony-heavy Python with awk cut command tokens by 40%—but ran <b>3.29× slower</b>. Brevity is a context optimization, not a runtime promise; keep structure that protects correctness.</p>
-        <div class="ex"><span class="c"># shell one-liner beats</span><br><span class="c"># a 12-line python walk</span></div>
+        <p class="why"><b>Default to bash</b> (grep/awk/jq/find) over Python for search/count/filter — reach for Python only when the task truly needs it. For throwaway Python, drop the ceremony: <b>no comments, docstrings, argparse, or main()</b>. Measured: awk vs ceremony-heavy Python cut code tokens 40% but ran <b>3.29× slower</b> — brevity is a context win, not a speed promise.</p>
+        <div class="ex"><span class="c"># grep/awk one-liner &gt; 12-line py</span><br><span class="c"># throwaway py: no comments/docstrings</span></div>
       </div>
     </div>
 
@@ -257,8 +257,8 @@
     </div>
 
     <div class="foot">
-      <span>measured across 10 tasks · all answers preserved</span>
-      <span>cl100k token proxy · not a universal billing claim</span>
+      <span>self-benchmarking plugin · re-runs weekly, logs its own findings</span>
+      <span>10 tasks · all answers preserved · cl100k proxy, not a universal billing claim</span>
     </div>
   </div>
 </div>
