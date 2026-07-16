@@ -29,6 +29,14 @@ Every token a command prints is injected into context **and re-billed every turn
 
 ---
 
+## Tool selection order (decide this first)
+
+1. **Native Claude Code tool** if one fits — **Grep** (content search), **Glob** (find files), **Read**, **Edit**, **Write**. Optimized, output-capped, and cross-platform (they work on native Windows without Git Bash, where shell `grep`/`find` don't exist). Don't shell out to `grep`/`find`/`cat`/`sed` when a native tool covers the job.
+2. **Bash** for what they don't do — aggregation & transforms: `awk`, `jq`, counts, sums, group-by, multi-stage pipelines.
+3. **Python** only when a one-liner can't do it cleanly.
+
+Then apply the three tiers below to whatever you write.
+
 ## How it works — three tiers, by impact
 
 | Tier | Lever | Billed as | Measured |
@@ -115,6 +123,21 @@ In agent sessions where output lingers, the Opus saving is closer to **~$250/mo*
 /plugin marketplace add MaceTenth/token-efficient-scripts
 /plugin install token-efficient-scripts@macetenth-plugins
 ```
+
+## Updating & auto-update
+
+This plugin is under **active development** — new versions ship regularly. Update manually any time with:
+
+```
+/plugin marketplace update macetenth-plugins
+/reload-plugins
+```
+
+**Recommended: enable auto-update** so you always have the latest without the manual step. In the plugin manager (`/plugin`) go to **Marketplaces → macetenth-plugins → Enable auto-update**:
+
+![Enable auto-update on the macetenth-plugins marketplace](docs/enable-auto-update.png)
+
+Claude Code then refreshes the marketplace and updates installed plugins in the background after each session start, and prompts you to run `/reload-plugins` when a new version is ready. (Third-party marketplaces have auto-update **off by default**, so this is opt-in.)
 
 ## Use
 
