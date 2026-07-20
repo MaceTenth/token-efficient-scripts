@@ -137,3 +137,12 @@ token counter: cl100k
 - output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
 - code: python walk -> find|wc: 60 -> 41 (32%), same_answer=True
 - predicate pushdown: 1.52x faster
+
+---
+# /bench run — 2026-07-20
+
+token counter: cl100k
+- output-control: grep -> grep -c: 192000 -> 3 (100%), same_answer=True
+- output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
+- code: python walk -> find|wc: 58 -> 39 (33%), same_answer=True
+- predicate pushdown: 1.68x faster
