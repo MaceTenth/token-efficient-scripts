@@ -182,3 +182,13 @@ token counter: cl100k
 - output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
 - code: python walk -> find|wc: 59 -> 40 (32%), same_answer=True
 - predicate pushdown: 1.65x faster
+
+---
+# /bench run — 2026-08-24
+
+token counter: cl100k
+- output-control: grep -> grep -c: 192000 -> 3 (100%), same_answer=True
+- output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
+- code: python walk -> find|wc: 59 -> 40 (32%), same_answer=True
+- predicate pushdown: 1.52x faster
+- range check: predicate pushdown 1.52x is the lowest of 5 logged runs (1.68/1.67/1.58/1.65/1.52); SKILL.md Tier 2 headlines 1.68x, which now sits at the top of the observed range rather than mid-range. Maintainer review: consider restating as a range (~1.5-1.7x, machine-dependent). No SKILL.md change made. Tier 1 (40.6-99.999%) still holds; all experiments same_answer=True.
