@@ -8,15 +8,20 @@ Write throwaway bash/python for one-off file & data tasks so they cost minimal t
 token-efficient-scripts/
 ├── .claude-plugin/plugin.json
 ├── skills/token-efficient-scripts/
-│   ├── SKILL.md                        # the skill (3-tier decision rule + guardrails)
+│   ├── SKILL.md                        # the skill (3 tiers + recovery ladder + guardrails)
 │   └── references/
 │       ├── benchmark-findings.md       # shipped read-only baseline findings
+│       ├── cli-failure-recovery.md     # failed-command recovery findings
 │       └── log-run.py                  # append helper (standalone use)
-├── commands/bench.md                   # /token-efficient-scripts:bench
+├── commands/
+│   ├── bench.md                        # /token-efficient-scripts:bench
+│   └── bench-recovery.md               # /token-efficient-scripts:bench-recovery
 ├── hooks/hooks.json                    # Stop hook -> scripts/on-stop.sh
 └── scripts/
     ├── bench.py                        # portable benchmark (tiktoken optional)
+    ├── bench-recovery.py               # failed-command recovery benchmark
     ├── run-bench.sh                    # runs bench.py, logs to $CLAUDE_PLUGIN_DATA
+    ├── run-bench-recovery.sh           # runs bench-recovery.py, logs to $CLAUDE_PLUGIN_DATA
     └── on-stop.sh                      # cheap deduped datapoint on session stop
 ```
 

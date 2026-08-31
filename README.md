@@ -104,6 +104,70 @@ All optimized commands were verified to return the **same answer** as their base
 
 ---
 
+## New in v0.5.0 — when a command *fails*
+
+Everything above is about writing a good command. This is about the moment one **fails** — where
+the default agent reflex, *read the man page*, is the most expensive habit available.
+
+Eight real GNU-flag-on-BSD failures (`date -d`, `stat -c`, `du --max-depth`, `grep -P`,
+`xargs -d`, `sed -i`, `find -printf`, `timeout`), each measured on **tokens returned**, **whether
+that text actually contains the answer**, and **wall clock**. Every fix verified correct.
+
+| Recovery strategy | tokens (8 lookups) | solved | tokens per answer |
+|---|---:|:---:|---:|
+| the error text you already have | 392 | 3/8 | 131 |
+| `cmd --help` | 464 | 4/8 | 116 |
+| ❌ `man cmd` (full page) | **26,316** | 6/8 | **4,386** |
+| `man cmd \| grep` (loose probe + `head`) | 3,173 | 5/8 | 635 |
+| ✅ `man cmd \| grep` (tight probe, `-m3 -B2 -A3`) | **870** | 6/8 | **145** |
+| web / cheatsheet, used *first* | 6,713 | 4/8 | 1,678 |
+
+A tight grep returns **the same 6/8 answers as reading the full pages, for 1/30th of the tokens.**
+
+### The ladder
+
+```
+error text (free) → cmd --help (~58) → tight man|grep (~150) → web, only if those return nothing
+```
+
+| ladder | tokens | solved | tool calls | wall clock |
+|---|---:|:---:|:---:|---:|
+| ❌ straight to `man` | 26,316 | 6/8 | 8 | 0.85s |
+| error → `--help` → full `man` | 14,183 | 6/8 | 9 | 0.44s |
+| error → `--help` → tight `man\|grep` | **438** | 6/8 | 9 | 0.43s |
+| ✅ …then the web for what local docs lack | **3,166** | **8/8** | 11 | 0.90s |
+
+**8.3× fewer tokens while solving two more scenarios** — ~3,290 tokens per failure down to ~400.
+
+### What it saves — and what it doesn't
+
+| | verdict |
+|---|---|
+| **Context tokens** | ✅ **the win** — 8.3× on the ladder, 30× on the man-page leg |
+| **Answer rate** | ✅ **the win** — 6/8 → 8/8; two cases local docs *cannot* answer at any price |
+| **Wall clock** | ⚠️ **no meaningful change** — every ladder lands within 0.43–0.90s |
+| **Tool round trips** | ⚠️ **a real cost** — 1 call becomes 0–3 (3/8 need *zero*, solved from the error text) |
+
+This is a **token and correctness** win, not a speed win. Claiming otherwise would not survive
+the benchmark.
+
+### Two traps it exposed
+
+- **`man timeout` returns ncurses `curs_inopts(3X)`** — 2,570 tokens about `cbreak`/`noecho`,
+  because coreutils ships the man page without the binary. Expensive *and* misleading.
+- **`man X | grep … | head -N` truncates past the answer.** `%z` is defined at line 178 of
+  `man stat`; a loose probe burned its 40-line window on early "format" matches. Tight probe
+  with `-m3`: 55 tokens. And grep with **`-B2`** — flag names sit *above* their prose.
+
+The division of labour is the real finding: **local docs** answer *"the flag exists, I used the
+GNU spelling"*; **the web** answers *"this flag doesn't exist here at all"* — an absence no man
+page states. The tight probe tells you which case you're in **for free**: on both web-only
+scenarios it returned **0 tokens**, an instant escalate signal instead of 8,955 wasted ones.
+
+> 📊 Method, full per-scenario table, and limitations: [`cli-failure-recovery.md`](plugins/token-efficient-scripts/skills/token-efficient-scripts/references/cli-failure-recovery.md) · re-run it yourself with `/token-efficient-scripts:bench-recovery`
+
+---
+
 ## What it saves (illustrative)
 
 An active user (~3,000 throwaway scripts/month, single-read baseline; not a universal guarantee — depends on task mix, tokenizer, caching):
@@ -143,6 +207,7 @@ Claude Code then refreshes the marketplace and updates installed plugins in the 
 
 - The **skill** activates automatically when you write a disposable script for a file/data question.
 - **`/token-efficient-scripts:bench`** — re-runs the benchmark locally and appends the result to your own `${CLAUDE_PLUGIN_DATA}/findings-log.md`. It runs entirely on your machine and does **not** push anywhere.
+- **`/token-efficient-scripts:bench-recovery`** — re-runs the failed-command recovery benchmark. Scenarios are prechecked, so on GNU userland it correctly reports *not applicable* rather than inventing numbers. `BENCH_NET=0` skips the network leg.
 
 ## Self-improvement model
 
@@ -154,7 +219,7 @@ Claude Code then refreshes the marketplace and updates installed plugins in the 
 
 ```
 .claude-plugin/marketplace.json      # marketplace manifest (macetenth-plugins)
-plugins/token-efficient-scripts/     # the plugin: skill + /bench command + stop hook + benchmark
+plugins/token-efficient-scripts/     # the plugin: skill + /bench + /bench-recovery + stop hook + benchmarks
 slide.html                           # one-slide explainer
 ```
 

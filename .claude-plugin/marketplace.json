@@ -6,7 +6,7 @@
     {
       "name": "token-efficient-scripts",
       "source": "./plugins/token-efficient-scripts",
-      "description": "Minimal-token throwaway bash/python for one-off file & data tasks, with a self-benchmarking /bench command."
+      "description": "Minimal-token throwaway bash/python for one-off file & data tasks, plus a measured ladder for recovering from failed commands without dumping man pages into context. Self-benchmarking."
     }
   ]
 }

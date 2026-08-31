@@ -1,6 +1,6 @@
 ---
 name: token-efficient-scripts
-description: Write throwaway bash/python commands used by Codex-, Claude-, or similar agent harnesses for one-off searching, counting, filtering, or aggregation over files, logs, simple CSV, or JSON. Use when a disposable command should answer a question while returning minimal tool output and avoiding unnecessary work. Prioritize correctness, output control, predicate pushdown, and only then code trimming. Do NOT use for production, library, or long-lived code where robustness and readability matter.
+description: Write throwaway bash/python commands used by Codex-, Claude-, or similar agent harnesses for one-off searching, counting, filtering, or aggregation over files, logs, simple CSV, or JSON. Use when a disposable command should answer a question while returning minimal tool output and avoiding unnecessary work. Prioritize correctness, output control, predicate pushdown, and only then code trimming. Also use the moment a shell command has just FAILED with an unknown/illegal flag or a missing binary, to recover the correct invocation cheaply instead of dumping a whole man page into context. Do NOT use for production, library, or long-lived code where robustness and readability matter.
 ---
 
 # Token-efficient throwaway scripts
@@ -42,6 +42,37 @@ Treat every printed token as context cost. Harnesses may truncate, compact, or c
 - **1-token names, not 1-char golf.** `count` and `c` both cost 1 token; keep normal spacing. Golfing saves characters, not tokens, and hurts correctness review.
 - **Do not infer speed from brevity.** The validation's shorter `awk` command used 40% fewer command tokens but ran 3.29× slower than its Python baseline.
 
+## When a command fails — recover in this order (8.3× fewer tokens than reading the man page)
+
+A failed command is a fork in the road, and the default reflex — read the man page — is the
+worst option measured: ~3,290 tokens per lookup, and it still cannot answer when the flag does
+not exist on this platform. Escalate cheapest-first and **stop at the first hit**.
+
+1. **Re-read the error you already have. It costs nothing.** BSD/macOS tools reject a bad flag
+   with their synopsis attached, which solved **3/8** measured failures with zero tool calls.
+   Never spend a call before reading what the failure already told you.
+2. **`cmd --help`** (~58 tokens; solved 4/8). On BSD it usually exits with the same usage block,
+   which is exactly what you want.
+3. **Grep the man page, tightly** (~145 tokens per answer):
+   `man cmd | col -b | grep -nE -m3 -B2 -A3 '<semantic phrase>'`
+   - Probe the **concept**, not the flag you guessed: `depth`, `size of file`, `in-place`, `null`.
+   - **`-B2` matters** — flag names sit *above* their prose, so an `-A`-only window describes the
+     behaviour without ever naming the flag.
+   - **`-m3`, not `| head -N`** — a `head` cap gets eaten by early false-positive matches before
+     it reaches the definition.
+   - **Returned nothing? That is the answer** — the flag does not exist here. Escalate to 4 now.
+4. **Search the web** (~800 tokens for one `WebSearch`) — but only for what local docs
+   structurally cannot say: *"this flag/tool does not exist on this platform, use X instead."*
+   Search-**first** scores worse than a targeted grep (1,678 vs 145 tokens per answer), and
+   community cheatsheets are GNU-centric enough to hand you back the invocation that just failed.
+
+**Never run `man cmd` unpiped.** Full pages measured 1,462–6,385 tokens each; the tight grep
+returned the same 6/8 answers for 1/30th of the tokens (870 vs 26,316).
+
+This ladder buys **tokens and answer rate, not speed** — every ladder measured within a second
+of the others, and it can add up to 2 tool round trips. See
+[references/cli-failure-recovery.md](references/cli-failure-recovery.md).
+
 ## Self-improvement protocol (run this when you benchmark or discover something new)
 
 This skill is designed to learn from its own use. When a run produces a measurement or a failure mode not already recorded:
@@ -58,6 +89,8 @@ This skill is designed to learn from its own use. When a run produces a measurem
 - **`sort` before `uniq`** — `uniq` only dedupes adjacent lines.
 - **Ties make "top N" ambiguous** — a different tie-break order is not a bug.
 - **Judge equivalence on the data, not the formatting** (dict vs columnar, quoting, trailing spaces).
+- **A man page you got may not be the tool you meant.** `man timeout` on macOS returns ncurses `curs_inopts(3X)` — coreutils ships the page without the binary. Check the page header names your command before trusting it.
+- **GNU flags are not BSD flags.** `date -d`, `stat -c`, `du --max-depth`, `grep -P`, `xargs -d`, `sed -i` (bare), `find -printf` and `timeout` all fail on macOS. Use the platform table in the cheat sheet.
 
 ## Validation summary
 
@@ -69,6 +102,8 @@ Ten deterministic throwaway tasks were tested on Darwin arm64. Every optimized c
 - Filter-before-sort ran **1.68× faster**; `rg -c` ran **6.99× faster** than `grep -c` on the tested workload.
 - Spilling complete results to a file saved **99.97% of returned tokens** but ran **1.64× slower**.
 - Shortening a Python command to `awk` cut command tokens **40%** but ran **3.29× slower**.
+
+- Recovering from a **failed** command: the full-man-page reflex cost **4,386 tokens per answer** and solved only 6/8; an error -> `--help` -> tight-`man|grep` -> web ladder solved **8/8 for 3,166 tokens** (8.3x fewer). It saves tokens and answer rate, **not** wall clock. See [references/cli-failure-recovery.md](references/cli-failure-recovery.md).
 
 Interpret token counts as directional: the benchmark used `cl100k_base` for continuity with the original measurements, not the private tokenizer or billing behavior of every current agent harness. Do not turn these measurements into a universal monthly cost claim without a representative workload, current pricing, and harness-specific accounting. Read [references/benchmark-findings.md](references/benchmark-findings.md) for the full experiment table, methodology, and limitations.
 
@@ -85,5 +120,20 @@ For plain content search or file-finding, prefer the native **Grep**/**Glob** to
 | Filter JSON array | `json.load`+loop | `jq '.[] \| select(...)'` |
 | Top-N frequency | `Counter` (small) | `sort\|uniq -c\|sort -rn\|head` |
 | Files by mtime/size | `os.walk`+stat | `find -mtime/-size` |
+
+### When a GNU invocation fails on BSD/macOS
+
+These eight are measured and verified — use them directly instead of paying for a lookup.
+
+| Failed with (GNU) | On BSD/macOS use |
+|---|---|
+| `date -d '2 days ago'` | `date -v-2d` |
+| `stat -c %s f` | `stat -f %z f` |
+| `du --max-depth=N` | `du -d N` |
+| `grep -P '\d+'` | `grep -E '[0-9]+'` |
+| `xargs -d,` | `tr ',' '\0' \| xargs -0` |
+| `sed -i s/a/b/ f` | `sed -i '' s/a/b/ f` |
+| `find … -printf '%f\n'` | `find … -exec basename {} ';'` |
+| `timeout N cmd` | `gtimeout` (brew coreutils), or `perl -e 'alarm N; exec @ARGV' cmd` |
 
 Prior art: this generalizes Infracost's "predicate pushdown" (push filtering close to the data) to script authoring, adding the output-frugality and correctness dimensions.
