@@ -123,7 +123,9 @@ For plain content search or file-finding, prefer the native **Grep**/**Glob** to
 
 ### When a GNU invocation fails on BSD/macOS
 
-These eight are measured and verified — use them directly instead of paying for a lookup.
+Use these directly instead of paying for a lookup. Every replacement is verified to run
+correctly on macOS **except `gtimeout`**, which needs `brew install coreutils` and is untested
+here — so the `perl` fallback leads that row.
 
 | Failed with (GNU) | On BSD/macOS use |
 |---|---|
@@ -134,6 +136,6 @@ These eight are measured and verified — use them directly instead of paying fo
 | `xargs -d,` | `tr ',' '\0' \| xargs -0` |
 | `sed -i s/a/b/ f` | `sed -i '' s/a/b/ f` |
 | `find … -printf '%f\n'` | `find … -mindepth 1 -exec basename {} ';'` (`-mindepth 1` drops the start dir, which `basename` would otherwise emit) |
-| `timeout N cmd` | `gtimeout` (brew coreutils), or `perl -e 'alarm N; exec @ARGV' cmd` |
+| `timeout N cmd` | `perl -e 'alarm N; exec @ARGV' cmd` (verified; nothing to install), or `gtimeout` after `brew install coreutils` (untested here) |
 
 Prior art: this generalizes Infracost's "predicate pushdown" (push filtering close to the data) to script authoring, adding the output-frugality and correctness dimensions.
