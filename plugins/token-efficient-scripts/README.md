@@ -22,6 +22,7 @@ token-efficient-scripts/
     ├── bench-recovery.py               # failed-command recovery benchmark
     ├── pre-bash-man.py                 # DENIES unfiltered `man`, returns the ladder
     ├── test-pre-bash-man.py             # 35 tests for that hook (--e2e drives real claude)
+    ├── test-cheatsheet.py               # verifies SKILL.md's platform table still works
     ├── run-bench.sh                    # runs bench.py, logs to $CLAUDE_PLUGIN_DATA
     ├── run-bench-recovery.sh           # runs bench-recovery.py, logs to $CLAUDE_PLUGIN_DATA
     └── on-stop.sh                      # cheap deduped datapoint on session stop
@@ -85,6 +86,28 @@ failure.
 
 `--e2e` spawns a real headless session via `--settings` and asserts both directions — that the
 denial reaches the model, and that a filtered `man` still runs. It touches no config of yours.
+
+### Testing the cheat sheet's advice
+
+The platform table in `SKILL.md` is the highest-value part of the skill — for those eight cases
+the answer is already in context, so no lookup happens at all. It is therefore the part most
+worth regression-testing, because bad advice there is worse than an expensive lookup:
+
+```
+python3 scripts/test-cheatsheet.py     # 8 verified, 1 skipped (gtimeout needs brew), 0 failed
+```
+
+Each row is asserted **twice**, so neither the advice nor the test can drift silently:
+
+1. the row's key form is still present in `SKILL.md` (a `table drifted:` failure means someone
+   edited the table without updating the test), and
+2. that form actually works on this host — `date -v-2d` really is two days ago, `du -d 1` really
+   does not reach depth 2, `sed -i ''` really leaves no backup file, `-mindepth 1` really does
+   exclude the start directory.
+
+Hermetic: its own tmp tree per row, never `/etc`, order-independent. A failure means **the shipped
+advice is wrong on this OS** — but check whether the *test* is wrong first; both of this suite's
+first two failures were scratch-file pollution and an async shell notice, not bad advice.
 
 ## Self-improvement model
 
