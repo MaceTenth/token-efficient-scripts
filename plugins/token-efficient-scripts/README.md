@@ -21,6 +21,7 @@ token-efficient-scripts/
     ├── bench.py                        # portable benchmark (tiktoken optional)
     ├── bench-recovery.py               # failed-command recovery benchmark
     ├── pre-bash-man.py                 # DENIES unfiltered `man`, returns the ladder
+    ├── test-pre-bash-man.py             # 35 tests for that hook (--e2e drives real claude)
     ├── run-bench.sh                    # runs bench.py, logs to $CLAUDE_PLUGIN_DATA
     ├── run-bench-recovery.sh           # runs bench-recovery.py, logs to $CLAUDE_PLUGIN_DATA
     └── on-stop.sh                      # cheap deduped datapoint on session stop
@@ -67,6 +68,23 @@ No false positives on `human`, `command -v man`, `/usr/share/man`, or bare `man`
 The denial itself costs **229 tokens** — 93% less than the average man page it replaces, and it
 is actionable rather than just a refusal. **To disable it**, delete the `PreToolUse` block from
 `hooks/hooks.json`, or use the `TE_ALLOW_MAN=1` prefix per call.
+
+**Tests.** A hook that misfires is worse than no hook, so it has its own suite:
+
+```
+python3 scripts/test-pre-bash-man.py          # 35 cases: fast, free, no API, no network
+python3 scripts/test-pre-bash-man.py --e2e    # ALSO drives a real `claude -p` (costs money)
+```
+
+The unit matrix covers what must be denied (`man find`, `man 5 hosts`, `MANWIDTH=80 man date`,
+and pipes that don't reduce — `| col -b`, `| cat`, `| less`), what must be allowed (a reducing
+filter, `-k`/`-w`/`-f`/`--help`, redirects, the override), and what must never false-positive
+(`human`, `command -v man`, `/usr/share/man`, `apropos`, bare `man`). Six cases assert it
+**fails open** on malformed stdin, a missing field, or a non-Bash tool. Exits non-zero on any
+failure.
+
+`--e2e` spawns a real headless session via `--settings` and asserts both directions — that the
+denial reaches the model, and that a filtered `man` still runs. It touches no config of yours.
 
 ## Self-improvement model
 
