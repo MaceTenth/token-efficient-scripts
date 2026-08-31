@@ -113,6 +113,26 @@ Eight real GNU-flag-on-BSD failures (`date -d`, `stat -c`, `du --max-depth`, `gr
 `xargs -d`, `sed -i`, `find -printf`, `timeout`), each measured on **tokens returned**, **whether
 that text actually contains the answer**, and **wall clock**. Every fix verified correct.
 
+### The headline, three honest ways
+
+Same eight failures, compared like for like — the reduction depends on which pairing you quote:
+
+| | comparison | reduction | answers |
+|---|---|---:|:---:|
+| **98%** | error text → `--help` → tight `man\|grep`  **vs**  reading man pages | 26,316 → **438** | 6/8 both ways |
+| **97%** | tight `man\|grep`  **vs**  full `man` (the grep leg alone) | 26,316 → **870** | 6/8 both ways |
+| **88%** | the full ladder incl. web  **vs**  reading man pages | 26,316 → **3,166** | 6/8 → **8/8** |
+
+The first two rows are strict like-for-like: **same source, same answers, ~98% fewer tokens.**
+The third is the one to quote when the point is correctness rather than cost — it's the only row
+that solves all eight.
+
+Three of the eight lookups cost **zero** because the answer was already in the error text, which
+is a real saving but does flatter the totals. The conservative per-lookup figure is
+**4,386 → 73 tokens per answer**.
+
+### Every strategy, measured
+
 | Recovery strategy | tokens (8 lookups) | solved | tokens per answer |
 |---|---:|:---:|---:|
 | the error text you already have | 392 | 3/8 | 131 |
