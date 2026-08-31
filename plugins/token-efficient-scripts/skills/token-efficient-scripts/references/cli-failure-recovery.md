@@ -107,8 +107,12 @@ for the web leg.
 ## Traps this run exposed
 
 1. **A man page can be the wrong document entirely.** `man timeout` returns ncurses
-   `curs_inopts(3X)` — 2,570 tokens about `cbreak`/`noecho`, because coreutils' man page is
-   installed while the binary is not. Expensive *and* misleading.
+   `curs_inopts(3X)` — 2,570 tokens about `cbreak`/`noecho`. The cause is not a stale package:
+   coreutils is not installed on the test host at all. Xcode's Command Line Tools SDK ships
+   `.../MacOSX.sdk/usr/share/man/man3/timeout.3x`, whose NAME line lists `timeout` as an alias
+   (a curses call that sets input-blocking delay), so `man` resolves the name to a page that is
+   entirely correct and entirely irrelevant, while no `timeout(1)` command exists. `man notimeout`
+   returns the same page. Expensive *and* misleading.
 2. **`man X | grep … | head -N` truncates past the answer.** `%z` is defined at line 178 of
    `man stat`; a loose `size|format` probe spent its 40-line window on early "format"
    matches and never reached it. A tight probe with `-m3` found it in 55 tokens.

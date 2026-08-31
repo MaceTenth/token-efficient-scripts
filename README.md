@@ -218,7 +218,9 @@ the benchmark.
 ### Two traps it exposed
 
 - **`man timeout` returns ncurses `curs_inopts(3X)`** — 2,570 tokens about `cbreak`/`noecho`,
-  because coreutils ships the man page without the binary. Expensive *and* misleading.
+  because Xcode's SDK ships a `timeout(3x)` C-function page (it sets curses input delay) and
+  `man` resolves the name to it — while no `timeout(1)` command exists at all. Nothing is broken;
+  the page is accurate and useless. Expensive *and* misleading.
 - **`man X | grep … | head -N` truncates past the answer.** `%z` is defined at line 178 of
   `man stat`; a loose probe burned its 40-line window on early "format" matches. Tight probe
   with `-m3`: 55 tokens. And grep with **`-B2`** — flag names sit *above* their prose.

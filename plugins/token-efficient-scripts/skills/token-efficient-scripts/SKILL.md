@@ -89,7 +89,7 @@ This skill is designed to learn from its own use. When a run produces a measurem
 - **`sort` before `uniq`** — `uniq` only dedupes adjacent lines.
 - **Ties make "top N" ambiguous** — a different tie-break order is not a bug.
 - **Judge equivalence on the data, not the formatting** (dict vs columnar, quoting, trailing spaces).
-- **A man page you got may not be the tool you meant.** `man timeout` on macOS returns ncurses `curs_inopts(3X)` — coreutils ships the page without the binary. Check the page header names your command before trusting it.
+- **A man page you got may not be the tool you meant.** `man timeout` on macOS returns ncurses `curs_inopts(3X)` — Xcode's SDK ships a `timeout(3x)` C-function page, and `man` resolves the name to it even though no `timeout(1)` command exists. The page is correct and irrelevant. Check its header names your command before trusting it.
 - **GNU flags are not BSD flags.** `date -d`, `stat -c`, `du --max-depth`, `grep -P`, `xargs -d`, `sed -i` (bare), `find -printf` and `timeout` all fail on macOS. Use the platform table in the cheat sheet.
 
 ## Validation summary
