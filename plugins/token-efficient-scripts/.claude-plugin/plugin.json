@@ -1,8 +1,8 @@
 {
   "name": "token-efficient-scripts",
   "displayName": "Token-Efficient Scripts",
-  "version": "0.5.0",
-  "description": "Write throwaway bash/python for one-off file & data tasks so they cost minimal tokens and run fast. Also covers recovering from a failed command without paying for a man page. Bundles the skill, /bench and /bench-recovery commands that re-run the benchmarks and log new findings, and a stop hook.",
+  "version": "0.6.0",
+  "description": "Write throwaway bash/python for one-off file & data tasks so they cost minimal tokens and run fast. Also covers recovering from a failed command without paying for a man page. Ships a PreToolUse hook that actually blocks an unfiltered `man` and hands back the cheaper ladder. Bundles the skill, /bench and /bench-recovery commands that re-run the benchmarks and log new findings, and a stop hook.",
   "author": { "name": "MaceTenth", "url": "https://github.com/MaceTenth" },
   "license": "MIT",
   "keywords": ["tokens", "cost", "bash", "python", "efficiency", "throwaway-scripts", "man-pages", "error-recovery", "bsd-vs-gnu"]

@@ -2,6 +2,58 @@
 
 All notable changes to the `token-efficient-scripts` plugin. Earlier history is in the git log.
 
+## 0.6.0 — 2026-08-31
+
+### Added — enforcement
+
+v0.5.0 measured the cheap path and documented it in the skill. A skill cannot enforce anything:
+it is injected text competing with a very strong training prior. This release adds the part the
+harness executes.
+
+- **`PreToolUse(Bash)` hook** (`scripts/pre-bash-man.py`) that **denies** an unfiltered `man`
+  and returns the escalation ladder as `permissionDecisionReason`, so the guidance reaches the
+  model rather than a debug log. (Note: `stderr` from a hook does *not* reach the model, so the
+  `exit 2` pattern would block silently and teach nothing.)
+- Deliberately narrow, verified against 18 cases. Denies `man find`, `man 5 hosts`,
+  `MANWIDTH=80 man date`, and pipes that don't reduce (`| col -b`, `| less`, `| cat`). Allows a
+  reducing filter, `-k`/`-w`/`-f`/`--help`, file redirects, and `TE_ALLOW_MAN=1`. No false
+  positives on `human`, `command -v man`, `/usr/share/man`, bare `man`.
+- **Fails open** on malformed stdin, missing fields, or a non-Bash tool — a hook that misfires
+  is worse than no hook. Stdlib only, no `jq`.
+- Disable by removing the `PreToolUse` block from `hooks/hooks.json`.
+
+### Measured
+
+The denial costs **229 tokens** vs the **3,290-token** average man page it replaces (93% less),
+and unlike a plain refusal it is actionable.
+
+### Fixed
+
+- Platform table: `find … -exec basename {} ';'` now includes **`-mindepth 1`**. Without it
+  `basename` also emits the starting directory (78 entries vs 77 for `/etc`). Found by a fresh
+  headless agent during end-to-end hook testing, which independently produced the better form.
+
+### Verified end-to-end
+
+The hook was tested in a fresh `claude -p` process via `--settings`, not just unit-tested:
+
+- `man find` → **denied**, and the ladder reached the model, which correctly reported it was
+  "blocked by a hook … advising cheaper alternatives".
+- `man find | col -b | grep -nE -m3 -B2 -A3 'maxdepth'` → **allowed**, ran, 7 lines. The hook
+  does not block Bash generally.
+- Given a real failure (`find -printf`), an agent reached the correct BSD form in 3 commands and
+  **never attempted `man find`** — 0 hook denials. A single trial, and the honest reading is that
+  the hook is *insurance* for a habit this model did not exhibit here, not a routine intervention.
+  It does not establish how often the habit occurs.
+
+### Explicitly not claimed
+
+- **This enforces one habit, not the skill.** Everything else in `SKILL.md` remains a
+  suggestion the model can ignore.
+- **Adherence is still unmeasured.** The benchmarks measure what each recovery path *costs*, not
+  how often a model *chooses* it. A real-world savings claim needs an adherence experiment
+  (same failing command, N trials, with and without the skill) that has not been run.
+
 ## 0.5.0 — 2026-08-31
 
 ### Added — failed-command recovery

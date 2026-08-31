@@ -104,6 +104,50 @@ All optimized commands were verified to return the **same answer** as their base
 
 ---
 
+## v0.6.0 — the hook that actually enforces it
+
+Everything above is a *skill*: injected text that biases the model. It cannot stop a tool call,
+so there is no guarantee an agent takes the cheap path — and plenty of reasons it won't ("read
+the man page" is one of the strongest habits in the training data, and token cost is invisible
+at decision time).
+
+So v0.6.0 ships a **`PreToolUse` hook**, which the harness runs — not the model. An unfiltered
+`man` is **denied**, and the denial hands back the ladder:
+
+```
+Unfiltered `man find` costs ~1,500-6,400 tokens of context and often does not
+contain the answer. Recover cheapest-first instead:
+1. Re-read the error you already have — BSD/macOS tools print their usage …
+2. `find --help` (~58 tokens).
+3. Grep the page, tightly: man find | col -b | grep -nE -m3 -B2 -A3 '<concept>' …
+4. Nothing returned? The flag does not exist here — search the web (~800 tokens).
+Override with `TE_ALLOW_MAN=1 man find` if you truly need the whole page.
+```
+
+Narrow by design, and it **fails open** on anything it doesn't understand — a hook that
+misfires is worse than no hook:
+
+| ❌ denied | ✅ allowed |
+|---|---|
+| `man find`, `man 5 hosts` | `man find \| col -b \| grep -nE -m3 -B2 -A3 'printf'` |
+| `man find \| col -b`, `man x \| less` — still the whole page | `man -k compress`, `man -w find` — already tiny |
+| `MANWIDTH=80 man date` | `man find > /tmp/f` — never enters context |
+| | `TE_ALLOW_MAN=1 man find` — explicit override |
+
+Verified against 18 cases: no false positives on `human`, `command -v man`, `/usr/share/man`,
+or bare `man`; malformed input always allows.
+
+**The denial costs 229 tokens** — 93% less than the average man page it replaces, and it teaches
+the ladder instead of just refusing. **To disable:** remove the `PreToolUse` block from
+`hooks/hooks.json`.
+
+> ⚠️ **What a hook does and doesn't fix.** It enforces *this one habit*. The skill's other
+> guidance is still only guidance, and the benchmark numbers above measure **what the efficient
+> path costs, not how often a model picks it**. Adherence is unmeasured — see
+> [the limitations](plugins/token-efficient-scripts/skills/token-efficient-scripts/references/cli-failure-recovery.md).
+
+---
+
 ## New in v0.5.0 — when a command *fails*
 
 Everything above is about writing a good command. This is about the moment one **fails** — where

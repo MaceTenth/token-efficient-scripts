@@ -16,10 +16,11 @@ token-efficient-scripts/
 ├── commands/
 │   ├── bench.md                        # /token-efficient-scripts:bench
 │   └── bench-recovery.md               # /token-efficient-scripts:bench-recovery
-├── hooks/hooks.json                    # Stop hook -> scripts/on-stop.sh
+├── hooks/hooks.json                    # PreToolUse(Bash) -> pre-bash-man.py; Stop -> on-stop.sh
 └── scripts/
     ├── bench.py                        # portable benchmark (tiktoken optional)
     ├── bench-recovery.py               # failed-command recovery benchmark
+    ├── pre-bash-man.py                 # DENIES unfiltered `man`, returns the ladder
     ├── run-bench.sh                    # runs bench.py, logs to $CLAUDE_PLUGIN_DATA
     ├── run-bench-recovery.sh           # runs bench-recovery.py, logs to $CLAUDE_PLUGIN_DATA
     └── on-stop.sh                      # cheap deduped datapoint on session stop
@@ -45,6 +46,27 @@ Or from a local clone:
 
 - The **skill** activates automatically when you write a disposable script for a file/data question.
 - Run **`/token-efficient-scripts:bench`** to re-benchmark and log any new finding.
+
+### The `man` hook (enforcement, not suggestion)
+
+A skill is injected text: it biases the model, it cannot stop a tool call. This plugin also
+ships a **`PreToolUse` hook** that does stop one — an unfiltered `man` is **denied**, and the
+denial hands back the ladder (`--help`, then a tight `grep`, then the web).
+
+It is deliberately narrow, and **fails open** on anything unexpected:
+
+| denied | allowed |
+|---|---|
+| `man find` | `man find \| col -b \| grep -nE -m3 -B2 -A3 'printf'` |
+| `man 5 hosts` | `man -k compress`, `man -w find` (already tiny) |
+| `man find \| col -b`, `man x \| less` (still the whole page) | `man find > /tmp/f` (never enters context) |
+| `MANWIDTH=80 man date` | `TE_ALLOW_MAN=1 man find` (explicit override) |
+
+No false positives on `human`, `command -v man`, `/usr/share/man`, or bare `man`.
+
+The denial itself costs **229 tokens** — 93% less than the average man page it replaces, and it
+is actionable rather than just a refusal. **To disable it**, delete the `PreToolUse` block from
+`hooks/hooks.json`, or use the `TE_ALLOW_MAN=1` prefix per call.
 
 ## Self-improvement model
 

@@ -133,7 +133,7 @@ These eight are measured and verified — use them directly instead of paying fo
 | `grep -P '\d+'` | `grep -E '[0-9]+'` |
 | `xargs -d,` | `tr ',' '\0' \| xargs -0` |
 | `sed -i s/a/b/ f` | `sed -i '' s/a/b/ f` |
-| `find … -printf '%f\n'` | `find … -exec basename {} ';'` |
+| `find … -printf '%f\n'` | `find … -mindepth 1 -exec basename {} ';'` (`-mindepth 1` drops the start dir, which `basename` would otherwise emit) |
 | `timeout N cmd` | `gtimeout` (brew coreutils), or `perl -e 'alarm N; exec @ARGV' cmd` |
 
 Prior art: this generalizes Infracost's "predicate pushdown" (push filtering close to the data) to script authoring, adding the output-frugality and correctness dimensions.
