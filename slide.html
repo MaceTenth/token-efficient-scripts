@@ -134,6 +134,8 @@
   .chips{display:flex; gap:8px; flex-wrap:wrap}
   .chip{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
     border:1px solid var(--line-strong); border-radius:20px; padding:4px 11px; white-space:nowrap}
+  .rails.ladder{background:var(--surface)}
+  .rails.ladder .rails-label{color:var(--accent)}
   .foot{padding:12px clamp(22px,3.4vw,40px) 20px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
     font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.03em}
 
@@ -148,7 +150,7 @@
     <div class="head">
       <p class="eyebrow">token-efficient-scripts <span>// claude code plugin · self-benchmarking</span></p>
       <h1>Throwaway commands that return <em>less context</em></h1>
-      <p class="thesis">For one-off shell/python that searches, counts, or aggregates data, context use is often dominated by <b>what the command prints back to the harness</b>. Ten deterministic experiments preserved every answer: reach for native <b>Grep/Glob/Read</b> first, then bash, then python — and optimize output first, data flow second, code last.</p>
+      <p class="thesis">For one-off shell/python that searches, counts, or aggregates data, context use is often dominated by <b>what the command prints back to the harness</b>. Ten deterministic experiments preserved every answer: reach for native <b>Grep/Glob/Read</b> first, then bash, then python — and optimize output first, data flow second, code last. <b>And when a command fails</b>, recover cheapest-first instead of reading the man page.</p>
     </div>
 
     <div class="hero">
@@ -224,6 +226,32 @@
       </div>
     </div>
 
+    <div class="hero">
+      <div class="hero-top">
+        <span class="hero-label">v0.6.0 · when the command FAILS — 8 GNU-flag-on-BSD failures, every fix verified</span>
+        <span class="hero-headline">tokens to reach the same answers — <b>98% cut</b></span>
+      </div>
+      <div class="bars">
+        <div class="bar-row">
+          <span class="bar-cap">man cmd</span>
+          <div class="bar waste">26,316 tokens &nbsp;— ~3,290 per page, and 2 of the 8 it cannot answer at any price</div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-cap">the ladder</span>
+          <div class="bar save">438</div>
+        </div>
+      </div>
+    </div>
+    <div class="rails ladder">
+      <span class="rails-label">↓ escalate cheapest-first · stop at the first hit</span>
+      <div class="chips">
+        <span class="chip">1 · re-read the error you have — free, solves 3/8</span>
+        <span class="chip">2 · cmd --help — ~58 tok</span>
+        <span class="chip">3 · man | grep -m3 -B2 -A3 'concept' — ~150 tok</span>
+        <span class="chip">4 · web only if 3 is empty — 8/8 for 3,166</span>
+        <span class="chip">hook DENIES unfiltered man</span>
+      </div>
+    </div>
     <div class="cost">
       <div class="cost-head">
         <span class="cost-title">10-task validation</span>
@@ -257,8 +285,8 @@
     </div>
 
     <div class="foot">
-      <span>self-benchmarking plugin · re-runs weekly, logs its own findings</span>
-      <span>10 tasks · all answers preserved · cl100k proxy, not a universal billing claim</span>
+      <span>self-benchmarking plugin · v0.6.0 · re-runs weekly, tests its own advice</span>
+      <span>10 tasks + 8 recovery scenarios · all answers preserved · cl100k proxy, not a universal billing claim</span>
     </div>
   </div>
 </div>

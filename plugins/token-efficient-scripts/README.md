@@ -23,6 +23,7 @@ token-efficient-scripts/
     ├── pre-bash-man.py                 # DENIES unfiltered `man`, returns the ladder
     ├── test-pre-bash-man.py             # 35 tests for that hook (--e2e drives real claude)
     ├── test-cheatsheet.py               # verifies SKILL.md's platform table still works
+    ├── check-release.py                 # pre-push gate (see ../../RELEASING.md)
     ├── run-bench.sh                    # runs bench.py, logs to $CLAUDE_PLUGIN_DATA
     ├── run-bench-recovery.sh           # runs bench-recovery.py, logs to $CLAUDE_PLUGIN_DATA
     └── on-stop.sh                      # cheap deduped datapoint on session stop

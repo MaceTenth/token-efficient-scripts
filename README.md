@@ -275,6 +275,20 @@ Claude Code then refreshes the marketplace and updates installed plugins in the 
 - **`/token-efficient-scripts:bench`** — re-runs the benchmark locally and appends the result to your own `${CLAUDE_PLUGIN_DATA}/findings-log.md`. It runs entirely on your machine and does **not** push anywhere.
 - **`/token-efficient-scripts:bench-recovery`** — re-runs the failed-command recovery benchmark. Scenarios are prechecked, so on GNU userland it correctly reports *not applicable* rather than inventing numbers. `BENCH_NET=0` skips the network leg.
 
+## Releasing
+
+Maintainers: see **[RELEASING.md](RELEASING.md)** — the checklist of every file a version
+touches, written from what actually broke. Gate every push on:
+
+```
+python3 plugins/token-efficient-scripts/scripts/check-release.py
+```
+
+It verifies the version agrees across `plugin.json`, `CHANGELOG.md` and the live `slide.html`,
+that headline numbers match across all five files that quote them, that no reduction is rounded
+up, that both test suites pass, and that the weekly task runs every benchmark without invoking
+the paid `--e2e` mode.
+
 ## Self-improvement model
 
 - Runtime findings accumulate in `${CLAUDE_PLUGIN_DATA}` (survives plugin updates).
