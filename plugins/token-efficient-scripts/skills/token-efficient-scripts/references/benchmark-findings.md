@@ -212,3 +212,13 @@ token counter: cl100k
 - code: python walk -> find|wc: 58 -> 39 (33%), same_answer=True
 - predicate pushdown: 1.55x faster
 - range check: predicate pushdown 1.55x — third consecutive run below SKILL.md's headline 1.68x (observed: 1.68/1.67/1.58/1.65/1.52/1.56/1.55; 1.68x remains the max, never the median). The "restate as a range (~1.5-1.7x, machine-dependent)" suggestion now has 3 replications; SKILL.md:29 and SKILL.md:102 still state a bare 1.68x. Maintainer review. No SKILL.md change made. Tier 1 (40.6-99.999%) still holds; all experiments same_answer=True, no correctness traps.
+
+---
+# /bench run — 2026-09-14
+
+token counter: cl100k
+- output-control: grep -> grep -c: 192000 -> 3 (100%), same_answer=True
+- output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
+- code: python walk -> find|wc: 59 -> 40 (32%), same_answer=True
+- predicate pushdown: 1.69x faster
+- range check: predicate pushdown 1.69x — first run ABOVE SKILL.md's headline 1.68x, which corrects the framing of the last three notes ("consistently below", "1.68x remains the max"): it does not. Full observed set is now 1.68/1.67/1.58/1.65/1.52/1.56/1.55/1.69, spread 1.52-1.69 with 1.68 near the top but not a ceiling. The standing "restate as a range (~1.5-1.7x, machine-dependent)" suggestion still holds and is better supported by the spread than by the earlier one-sided reading. Maintainer review; no SKILL.md change made. Tier 1 (40.6-99.999%) still holds; all experiments same_answer=True, no correctness traps.
