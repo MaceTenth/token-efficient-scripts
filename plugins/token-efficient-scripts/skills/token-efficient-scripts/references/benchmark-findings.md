@@ -232,3 +232,13 @@ token counter: cl100k
 - code: python walk -> find|wc: 59 -> 40 (32%), same_answer=True
 - predicate pushdown: 1.53x faster
 - range check: predicate pushdown 1.53x vs SKILL.md's bare 1.68x (SKILL.md:29, SKILL.md:102). Nine runs now span 1.52-1.69 (median 1.58), so 1.68x is near the top of the spread, not typical of it; the standing "restate as a range (~1.5-1.7x, machine-dependent)" suggestion is unchanged and well past the 2-replication bar. Maintainer review; no SKILL.md change made. Tier 1 (40.6-99.999%) still holds; all experiments same_answer=True, no correctness traps.
+
+---
+# /bench run — 2026-09-28
+
+token counter: cl100k
+- output-control: grep -> grep -c: 192000 -> 3 (100%), same_answer=True
+- output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
+- code: python walk -> find|wc: 59 -> 40 (32%), same_answer=True
+- predicate pushdown: 1.72x faster
+- range check: predicate pushdown 1.72x — new high, above both SKILL.md's bare 1.68x (SKILL.md:29, SKILL.md:102) and the upper end of the standing "~1.5-1.7x" range suggestion. Ten runs now span 1.52-1.72 (median ~1.62); if restated as a range, ~1.5-1.75x (machine-dependent) covers the observed spread. Maintainer review; no SKILL.md change made. Tier 1 (40.6-99.999%) still holds; all experiments same_answer=True, no correctness traps.
