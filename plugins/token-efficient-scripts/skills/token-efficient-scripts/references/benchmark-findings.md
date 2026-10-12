@@ -251,3 +251,22 @@ token counter: cl100k
 - output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
 - code: python walk -> find|wc: 58 -> 39 (33%), same_answer=True
 - predicate pushdown: 1.62x faster
+
+---
+# /bench run — 2026-10-12
+
+token counter: chars/4 proxy
+- output-control: grep -> grep -c: 77818 -> 2 (100%), same_answer=True
+- output-control: rows -> aggregate: 147236 -> 2 (100%), same_answer=True
+- code: python walk -> find|wc: 32 -> 20 (38%), same_answer=True
+- predicate pushdown: 1.53x faster
+- env note: the unattended `python3` resolved to /Library/Frameworks 3.13, which has no tiktoken (`/opt/homebrew/bin/python3` no longer exists), so this run fell back to the chars/4 proxy and is not comparable with prior cl100k runs. Kept, since the log is append-only; the next section re-runs with `/opt/homebrew/bin/python3.14` (has tiktoken) to keep the cl100k series going. Maintainer: restore a tiktoken-capable `python3` on PATH, otherwise future unattended runs will log proxy numbers only.
+
+---
+# /bench run — 2026-10-12
+
+token counter: cl100k
+- output-control: grep -> grep -c: 192000 -> 3 (100%), same_answer=True
+- output-control: rows -> aggregate: 299500 -> 4 (100%), same_answer=True
+- code: python walk -> find|wc: 58 -> 39 (33%), same_answer=True
+- predicate pushdown: 1.70x faster

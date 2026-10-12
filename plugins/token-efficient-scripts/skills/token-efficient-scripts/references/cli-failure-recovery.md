@@ -245,3 +245,34 @@ applicable scenarios: 8/8
 - ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.32s
 - ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.32s
 - all fixes verified correct: True
+
+---
+# /bench-recovery run — 2026-10-12
+
+token counter: chars/4 proxy
+applicable scenarios: 8/8
+- error only: 279 tok, solved 3/8, 93 tok/answer, 0.00s
+- --help: 333 tok, solved 4/8, 83 tok/answer, 0.03s
+- man (full): 27058 tok, solved 6/8, 4510 tok/answer, 0.72s
+- man|grep loose: 2977 tok, solved 5/8, 595 tok/answer, 0.72s
+- man|grep TIGHT: 809 tok, solved 6/8, 135 tok/answer, 0.72s
+- ladder A naive full man: 27058 tok, 6/8 solved, 8 calls, 0.72s
+- ladder B error/help/full man: 14628 tok, 6/8 solved, 9 calls, 0.38s
+- ladder C error/help/tight grep: 378 tok, 6/8 solved, 9 calls, 0.38s
+- all fixes verified correct: True
+- env note: the unattended `python3` (/Library/Frameworks 3.13) has no tiktoken, so this run used the chars/4 proxy and is not comparable with prior cl100k runs. Kept, since the log is append-only; the next section re-runs with `/opt/homebrew/bin/python3.14` (has tiktoken) and matches 2026-10-05 exactly. Test suites (run with the default `python3`): cheatsheet 8/9 verified, 1 skipped (gtimeout), 0 failed, EXIT=0; hook 35/35 passed, EXIT=0.
+
+---
+# /bench-recovery run — 2026-10-12
+
+token counter: cl100k
+applicable scenarios: 8/8
+- error only: 393 tok, solved 3/8, 131 tok/answer, 0.00s
+- --help: 464 tok, solved 4/8, 116 tok/answer, 0.03s
+- man (full): 26316 tok, solved 6/8, 4386 tok/answer, 0.76s
+- man|grep loose: 3173 tok, solved 5/8, 635 tok/answer, 0.76s
+- man|grep TIGHT: 870 tok, solved 6/8, 145 tok/answer, 0.75s
+- ladder A naive full man: 26316 tok, 6/8 solved, 8 calls, 0.76s
+- ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.40s
+- ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.40s
+- all fixes verified correct: True
