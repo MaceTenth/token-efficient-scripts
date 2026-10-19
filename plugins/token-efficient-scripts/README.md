@@ -8,24 +8,28 @@ Write throwaway bash/python for one-off file & data tasks so they cost minimal t
 token-efficient-scripts/
 ├── .claude-plugin/plugin.json
 ├── skills/token-efficient-scripts/
-│   ├── SKILL.md                        # the skill (3 tiers + recovery ladder + guardrails)
+│   ├── SKILL.md                        # the skill (3 tiers + verdict commands + recovery ladder + guardrails)
 │   └── references/
 │       ├── benchmark-findings.md       # shipped read-only baseline findings
 │       ├── cli-failure-recovery.md     # failed-command recovery findings
+│       ├── verification-output.md      # tests/builds/git/archives: loud vs quiet findings
 │       └── log-run.py                  # append helper (standalone use)
 ├── commands/
 │   ├── bench.md                        # /token-efficient-scripts:bench
-│   └── bench-recovery.md               # /token-efficient-scripts:bench-recovery
+│   ├── bench-recovery.md               # /token-efficient-scripts:bench-recovery
+│   └── bench-verify.md                 # /token-efficient-scripts:bench-verify
 ├── hooks/hooks.json                    # PreToolUse(Bash) -> pre-bash-man.py; Stop -> on-stop.sh
 └── scripts/
     ├── bench.py                        # portable benchmark (tiktoken optional)
     ├── bench-recovery.py               # failed-command recovery benchmark
+    ├── bench-verify.py                 # verification-output benchmark (hermetic fixtures)
     ├── pre-bash-man.py                 # DENIES unfiltered `man`, returns the ladder
     ├── test-pre-bash-man.py             # 35 tests for that hook (--e2e drives real claude)
     ├── test-cheatsheet.py               # verifies SKILL.md's platform table still works
     ├── check-release.py                 # pre-push gate (see ../../RELEASING.md)
     ├── run-bench.sh                    # runs bench.py, logs to $CLAUDE_PLUGIN_DATA
     ├── run-bench-recovery.sh           # runs bench-recovery.py, logs to $CLAUDE_PLUGIN_DATA
+    ├── run-bench-verify.sh             # runs bench-verify.py, logs to $CLAUDE_PLUGIN_DATA
     └── on-stop.sh                      # cheap deduped datapoint on session stop
 ```
 
@@ -47,8 +51,9 @@ Or from a local clone:
 
 ## Use
 
-- The **skill** activates automatically when you write a disposable script for a file/data question.
+- The **skill** activates automatically when you write a disposable script for a file/data question, or run tests, a build, git or an archive extraction only to learn the verdict.
 - Run **`/token-efficient-scripts:bench`** to re-benchmark and log any new finding.
+- Run **`/token-efficient-scripts:bench-verify`** to measure loud vs quiet forms of tests, builds, git and archive commands (97.1% fewer tokens in the shipped run, every answer kept, no speed change).
 
 ### The `man` hook (enforcement, not suggestion)
 

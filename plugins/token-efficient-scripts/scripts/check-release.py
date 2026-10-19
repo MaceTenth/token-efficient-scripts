@@ -45,8 +45,10 @@ else: ok("SKILL.md frontmatter description present")
 print("\nheadline numbers agree across files")
 # a number that appears in >1 file must appear consistently; each is (label, needle, files)
 FILES = {"README": read(P("README.md")), "CHANGELOG": chg, "SKILL": read(SKILL), "slide": slide,
-         "findings": read(P(*PLUG, "skills", "token-efficient-scripts", "references", "cli-failure-recovery.md"))}
-for label, needle in [("naive man total", "26,316"), ("ladder C total", "438"), ("full ladder", "3,166")]:
+         "findings": read(P(*PLUG, "skills", "token-efficient-scripts", "references", "cli-failure-recovery.md")),
+         "verify": read(P(*PLUG, "skills", "token-efficient-scripts", "references", "verification-output.md"))}
+for label, needle in [("naive man total", "26,316"), ("ladder C total", "438"), ("full ladder", "3,166"),
+                      ("verify loud total", "31,031"), ("verify reduction", "97.1%")]:
     hits = [f for f, t in FILES.items() if needle in t or needle.replace(",", "") in t]
     (ok if len(hits) >= 2 else warn)(f"{label} {needle}: {', '.join(hits) or 'NOWHERE'}")
 for bad in re.findall(r"\b9[05]% fewer tokens\b", FILES["README"]):
@@ -54,6 +56,8 @@ for bad in re.findall(r"\b9[05]% fewer tokens\b", FILES["README"]):
 
 print("\nreferenced files exist")
 for rel in [(*PLUG, "scripts", "bench.py"), (*PLUG, "scripts", "bench-recovery.py"),
+            (*PLUG, "scripts", "bench-verify.py"), (*PLUG, "scripts", "run-bench-verify.sh"),
+            (*PLUG, "commands", "bench-verify.md"),
             (*PLUG, "scripts", "test-cheatsheet.py"), (*PLUG, "scripts", "test-pre-bash-man.py"),
             (*PLUG, "scripts", "pre-bash-man.py"), (*PLUG, "hooks", "hooks.json"),
             (*PLUG, "commands", "bench.md"), (*PLUG, "commands", "bench-recovery.md"),
@@ -73,7 +77,7 @@ print("\nweekly task wiring")
 wt = read(os.path.expanduser("~/.claude/scheduled-tasks/token-efficient-scripts-weekly-bench/SKILL.md"))
 if not wt: warn("weekly task file not found on this host (fine if you are not the maintainer)")
 else:
-    for scr in ("bench.py", "bench-recovery.py", "test-cheatsheet.py", "test-pre-bash-man.py"):
+    for scr in ("bench.py", "bench-recovery.py", "bench-verify.py", "test-cheatsheet.py", "test-pre-bash-man.py"):
         (ok if scr in wt else warn)(f"weekly task runs {scr}")
     # only flag an ACTUAL invocation; the task legitimately mentions --e2e to forbid it
     if re.search(r"\.py[^\n`]*--e2e", wt):

@@ -1,6 +1,6 @@
 ---
 name: token-efficient-scripts
-description: Write throwaway bash/python commands used by Codex-, Claude-, or similar agent harnesses for one-off searching, counting, filtering, or aggregation over files, logs, simple CSV, or JSON. Use when a disposable command should answer a question while returning minimal tool output and avoiding unnecessary work. Prioritize correctness, output control, predicate pushdown, and only then code trimming. Also use the moment a shell command has just FAILED with an unknown/illegal flag or a missing binary, to recover the correct invocation cheaply instead of dumping a whole man page into context. Do NOT use for production, library, or long-lived code where robustness and readability matter.
+description: Write throwaway bash/python commands used by Codex-, Claude-, or similar agent harnesses for one-off searching, counting, filtering, or aggregation over files, logs, simple CSV, or JSON. Use when a disposable command should answer a question while returning minimal tool output and avoiding unnecessary work. Prioritize correctness, output control, predicate pushdown, and only then code trimming. Also use the moment a shell command has just FAILED with an unknown/illegal flag or a missing binary, to recover the correct invocation cheaply instead of dumping a whole man page into context. Also use when running a test suite, a build or compile, git log/show/diff, or an archive extraction only to learn the verdict (pass/fail, what broke, which files), to ask for the tool's quiet form instead of its full log. Do NOT use for production, library, or long-lived code where robustness and readability matter.
 ---
 
 # Token-efficient throwaway scripts
@@ -41,6 +41,16 @@ Treat every printed token as context cost. Harnesses may truncate, compact, or c
 - **Remove unnecessary intermediate variables**; keep variables that clarify semantics or prevent repeated work.
 - **1-token names, not 1-char golf.** `count` and `c` both cost 1 token; keep normal spacing. Golfing saves characters, not tokens, and hurts correctness review.
 - **Do not infer speed from brevity.** The validation's shorter `awk` command used 40% fewer command tokens but ran 3.29× slower than its Python baseline.
+
+## Commands run only to check something — ask for the verdict, not the log (97.1% fewer tokens measured)
+
+Tests, builds, git inspection and archive extraction print a running log; you need *did it pass*, *what broke*, or *which files*. Most tools have a quiet form that returns just that. Use it when it answers the question you are asking.
+
+- **Tests:** `pytest -q`, not `-v` (`-v` was 11× plain `pytest`). Only need pass/fail? `pytest -q >/tmp/t.log 2>&1 && echo ok || tail -5 /tmp/t.log`. Test runners print their summary **last**. Warnings can be most of the output: add `--disable-warnings` when they are not the question.
+- **Compilers:** the root cause comes **first**, and template notes bury the next one. Use `2>&1 | grep -m5 'error:'`, not `| head` or `| tail`. Rust: `cargo build -q --message-format=short`.
+- **git:** `git log --oneline -N`. Which files changed: `git show --name-only --format= <rev>`, `git diff --name-only A B` (`--stat` adds line counts). Only when the question is *which* files, not *what* changed.
+- **Archives:** drop the `v`: `tar -xf`, `unzip -q`. Success is the exit status; if the harness does not show it, append `; echo rc=$?`.
+- This saves tokens, **not time**: measured runtimes were unchanged. See [references/verification-output.md](references/verification-output.md).
 
 ## When a command fails — recover in this order (8.3× fewer tokens than reading the man page)
 
@@ -89,6 +99,7 @@ This skill is designed to learn from its own use. When a run produces a measurem
 - **`sort` before `uniq`** — `uniq` only dedupes adjacent lines.
 - **Ties make "top N" ambiguous** — a different tie-break order is not a bug.
 - **Judge equivalence on the data, not the formatting** (dict vs columnar, quoting, trailing spaces).
+- **A fixed `head`/`tail` cut can drop the answer from diagnostic output.** On a C++ template error, `| head -20` kept one of two root causes and `| tail -20` kept neither; `grep -m5 'error:'` kept both. Cut by content, not by line count.
 - **A man page you got may not be the tool you meant.** `man timeout` on macOS returns ncurses `curs_inopts(3X)` — Xcode's SDK ships a `timeout(3x)` C-function page, and `man` resolves the name to it even though no `timeout(1)` command exists. The page is correct and irrelevant. Check its header names your command before trusting it.
 - **GNU flags are not BSD flags.** `date -d`, `stat -c`, `du --max-depth`, `grep -P`, `xargs -d`, `sed -i` (bare), `find -printf` and `timeout` all fail on macOS. Use the platform table in the cheat sheet.
 
@@ -104,6 +115,7 @@ Ten deterministic throwaway tasks were tested on Darwin arm64. Every optimized c
 - Shortening a Python command to `awk` cut command tokens **40%** but ran **3.29× slower**.
 
 - Recovering from a **failed** command: the full-man-page reflex cost **4,386 tokens per answer** and solved only 6/8; an error -> `--help` -> tight-`man|grep` -> web ladder solved **8/8 for 3,166 tokens** (8.3x fewer). It saves tokens and answer rate, **not** wall clock. See [references/cli-failure-recovery.md](references/cli-failure-recovery.md).
+- Commands run only for a verdict (tests, builds, git, archives): the quiet form returned **97.1% fewer tokens** across ten scenarios (31,031 → 893), kept every answer in two runs, and ran **no faster**. See [references/verification-output.md](references/verification-output.md).
 
 Interpret token counts as directional: the benchmark used `cl100k_base` for continuity with the original measurements, not the private tokenizer or billing behavior of every current agent harness. Do not turn these measurements into a universal monthly cost claim without a representative workload, current pricing, and harness-specific accounting. Read [references/benchmark-findings.md](references/benchmark-findings.md) for the full experiment table, methodology, and limitations.
 

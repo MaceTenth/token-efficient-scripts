@@ -104,6 +104,52 @@ All optimized commands were verified to return the **same answer** as their base
 
 ---
 
+## New in v0.7.0 — commands you run only to check something
+
+Tests, builds, git and archive extraction print a running log by default. The agent usually
+needs one line of it: *did it pass*, *what broke*, or *which files*. Most of these tools already
+have a quiet form that returns just that.
+
+Ten scenarios with generated, repeatable fixtures. Every quiet form was checked to still contain
+the answer:
+
+| scenario | habit | tokens | quiet form | tokens | saved |
+|---|---|---:|---|---:|---:|
+| pytest, 300 tests pass | `pytest` | 469 | `pytest -q >log 2>&1 && echo ok \|\| tail -5 log` | 2 | 99.5% |
+| pytest, 1 of 301 fails | `pytest` | 571 | same | 49 | 91.4% |
+| pytest, 1 fails + 30 warnings | `pytest` | 2,941 | same | 63 | 97.8% |
+| C++ template error | `clang++ -fsyntax-only` | 10,860 | `2>&1 \| grep -m5 'error:'` | 219 | 97.9% |
+| Rust, 3 type errors | `cargo build` | 339 | `cargo build -q --message-format=short` | 102 | 69.9% |
+| last 20 commits | `git log -20` | 1,383 | `git log --oneline -20` | 383 | 72.3% |
+| files in one commit | `git show <rev>` | 850 | `git show --name-only --format= <rev>` | 15 | 98.2% |
+| files in 10 commits | `git diff A B` | 6,143 | `git diff --name-only A B` | 60 | 99.0% |
+| unzip 400 files | `unzip x.zip` | 4,172 | `unzip -q x.zip` | 0 | 100.0% |
+| untar 400 files | `tar -xvf x.tar` | 3,303 | `tar -xf x.tar` | 0 | 100.0% |
+| **total** | | **31,031** | | **893** | **97.1%** |
+
+A second run gave 30,963 → 893 (97.1%), and every answer was kept both times. The pytest baseline
+is plain `pytest`, not `pytest -v`. `-v` would have flattered the result: it printed 5,254 tokens
+for the passing suite.
+
+### What it saves — and what it doesn't
+
+| | verdict |
+|---|---|
+| **Context tokens** | ✅ **the win**: 97.1% fewer across ten scenarios |
+| **Wall clock** | ⚠️ **no change**: 1.30s → 1.26s in total, within noise. Same work, less printing |
+| **Information** | ⚠️ **narrower, on purpose**: `--name-only` says *which* files changed, not *what* changed. Use the quiet form when it answers the question asked |
+
+### The trap it exposed
+
+Cutting compiler output to a fixed number of lines lost the answer. A C++ template error
+printed 400 lines (10,860 tokens): `| head -20` kept one of the two root causes, and `| tail -20`
+kept **neither**. `grep -m5 'error:'` kept both in 219 tokens. Test runners print their verdict
+last; compilers print the root cause first and bury the next one in template notes.
+
+> 📊 Method, every variant, and limitations: [`verification-output.md`](plugins/token-efficient-scripts/skills/token-efficient-scripts/references/verification-output.md) · re-run it yourself with `/token-efficient-scripts:bench-verify`
+
+---
+
 ## v0.6.0 — the hook that actually enforces it
 
 Everything above is a *skill*: injected text that biases the model. It cannot stop a tool call,
@@ -274,6 +320,7 @@ Claude Code then refreshes the marketplace and updates installed plugins in the 
 - The **skill** activates automatically when you write a disposable script for a file/data question.
 - **`/token-efficient-scripts:bench`** — re-runs the benchmark locally and appends the result to your own `${CLAUDE_PLUGIN_DATA}/findings-log.md`. It runs entirely on your machine and does **not** push anywhere.
 - **`/token-efficient-scripts:bench-recovery`** — re-runs the failed-command recovery benchmark. Scenarios are prechecked, so on GNU userland it correctly reports *not applicable* rather than inventing numbers. `BENCH_NET=0` skips the network leg.
+- **`/token-efficient-scripts:bench-verify`**: re-runs the verification-output benchmark (tests, builds, git, archives). A scenario whose tool isn't installed is reported *not applicable*; it exits non-zero if a quiet form ever loses the answer.
 
 ## Releasing
 
@@ -299,7 +346,7 @@ the paid `--e2e` mode.
 
 ```
 .claude-plugin/marketplace.json      # marketplace manifest (macetenth-plugins)
-plugins/token-efficient-scripts/     # the plugin: skill + /bench + /bench-recovery + stop hook + benchmarks
+plugins/token-efficient-scripts/     # the plugin: skill + /bench + /bench-recovery + /bench-verify + hooks + benchmarks
 slide.html                           # one-slide explainer
 ```
 

@@ -150,7 +150,7 @@
     <div class="head">
       <p class="eyebrow">token-efficient-scripts <span>// claude code plugin · self-benchmarking</span></p>
       <h1>Throwaway commands that return <em>less context</em></h1>
-      <p class="thesis">For one-off shell/python that searches, counts, or aggregates data, context use is often dominated by <b>what the command prints back to the harness</b>. Ten deterministic experiments preserved every answer: reach for native <b>Grep/Glob/Read</b> first, then bash, then python — and optimize output first, data flow second, code last. <b>And when a command fails</b>, recover cheapest-first instead of reading the man page.</p>
+      <p class="thesis">For one-off shell/python that searches, counts, or aggregates data, context use is often dominated by <b>what the command prints back to the harness</b>. Ten deterministic experiments preserved every answer: reach for native <b>Grep/Glob/Read</b> first, then bash, then python — and optimize output first, data flow second, code last. <b>And when a command fails</b>, recover cheapest-first instead of reading the man page. <b>When you only need a verdict</b> — tests, builds, git — ask for the quiet form.</p>
     </div>
 
     <div class="hero">
@@ -252,6 +252,32 @@
         <span class="chip">hook DENIES unfiltered man</span>
       </div>
     </div>
+
+    <div class="hero">
+      <div class="hero-top">
+        <span class="hero-label">v0.7.0 · commands run only to CHECK something — tests, builds, git, archives · every answer kept</span>
+        <span class="hero-headline">tokens to get the verdict — <b>97.1% cut</b></span>
+      </div>
+      <div class="bars">
+        <div class="bar-row">
+          <span class="bar-cap">loud default</span>
+          <div class="bar waste">31,031 tokens &nbsp;— pytest, compiler spew, git diff, unzip, tar -v</div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-cap">quiet form</span>
+          <div class="bar save">893</div>
+        </div>
+      </div>
+    </div>
+    <div class="rails ladder">
+      <span class="rails-label">↓ ask for the verdict, not the log · saves tokens, not time</span>
+      <div class="chips">
+        <span class="chip">pytest -q … &amp;&amp; echo ok || tail -5 log</span>
+        <span class="chip">2&gt;&amp;1 | grep -m5 'error:'</span>
+        <span class="chip">git log --oneline · diff --name-only</span>
+        <span class="chip">tar -xf · unzip -q</span>
+      </div>
+    </div>
     <div class="cost">
       <div class="cost-head">
         <span class="cost-title">10-task validation</span>
@@ -281,12 +307,13 @@
         <span class="chip">compare data, not format</span>
         <span class="chip">shorter ≠ faster</span>
         <span class="chip">awk CSV only when simple</span>
+        <span class="chip">head/tail can cut the error</span>
       </div>
     </div>
 
     <div class="foot">
-      <span>self-benchmarking plugin · v0.6.0 · re-runs weekly, tests its own advice</span>
-      <span>10 tasks + 8 recovery scenarios · all answers preserved · cl100k proxy, not a universal billing claim</span>
+      <span>self-benchmarking plugin · v0.7.0 · re-runs weekly, tests its own advice</span>
+      <span>10 tasks + 8 recovery + 10 verification scenarios · all answers preserved · cl100k proxy, not a universal billing claim</span>
     </div>
   </div>
 </div>

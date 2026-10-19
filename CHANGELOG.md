@@ -2,6 +2,52 @@
 
 All notable changes to the `token-efficient-scripts` plugin. Earlier history is in the git log.
 
+## 0.7.0 — 2026-10-19
+
+### Added — commands run only to check something
+
+Earlier releases covered commands that ask a question of data, and recovering from a failed
+command. This one covers the commands an agent runs only to learn a verdict: a test suite, a
+build, git history, an archive extraction. They print a running log by default; the agent needs
+*did it pass*, *what broke*, or *which files*.
+
+- **`SKILL.md` section** with the quiet forms: `pytest -q` (plus an `&& echo ok || tail -5 log`
+  wrapper and `--disable-warnings`), `grep -m5 'error:'` for compilers,
+  `cargo build -q --message-format=short`, `git log --oneline`, `git show/diff --name-only`,
+  `tar -xf`, `unzip -q`.
+- **New correctness guardrail:** a fixed `head`/`tail` cut can drop the answer from diagnostic
+  output. Cut by content, not by line count.
+- **Trigger description extended** so the skill loads when running tests, builds, git or archive
+  extraction for a verdict. Without it the new section would never fire.
+- **`scripts/bench-verify.py`**, **`/bench-verify`** and **`run-bench-verify.sh`**: ten
+  scenarios on generated, repeatable fixtures (pytest, clang++, cargo, git, unzip, tar). Each
+  compares the loud habit with the quiet form on tokens, whether the answer survived, and median
+  wall clock. A missing tool is reported not-applicable. Exits 1 if a quiet form loses the answer.
+- **`references/verification-output.md`**: method, results, traps, limitations, append-only log.
+
+### Measured
+
+Darwin 25.5 arm64, cl100k_base, two runs on the same host:
+
+- **31,031 → 893 tokens (97.1% fewer)** across the ten scenarios; the second run gave
+  30,963 → 893 (97.1%). Every quiet form kept the answer in both runs.
+- Per scenario: 69.9% (cargo) to 100.0% (`unzip -q`, `tar -xf`).
+- The pytest baseline is plain `pytest`. `pytest -v` printed 5,254 tokens for the passing
+  suite, 11× plain `pytest`; no headline number uses it.
+- The trap: on a 400-line C++ template error, `| head -20` kept one of two root causes and
+  `| tail -20` kept neither. `grep -m5 'error:'` kept both in 219 tokens.
+
+### Explicitly not claimed
+
+- **No speed saving.** 1.30s → 1.26s in total, within noise. The tools do the same work either
+  way.
+- **The quiet forms answer a narrower question.** `--name-only` says which files changed, not
+  what changed; `--disable-warnings` hides warnings. Use them only when they answer the question
+  asked.
+- **Adherence is unmeasured, and nothing enforces this.** There is deliberately no hook:
+  `pytest -v` and a full `git diff` are sometimes the right call.
+- **One host, synthetic fixtures.** The compiler scenario is clang/libc++-specific.
+
 ## 0.6.0 — 2026-08-31
 
 ### Added — enforcement
