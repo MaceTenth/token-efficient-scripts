@@ -276,3 +276,18 @@ applicable scenarios: 8/8
 - ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.40s
 - ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.40s
 - all fixes verified correct: True
+
+---
+# /bench-recovery run — 2026-10-19
+
+token counter: cl100k
+applicable scenarios: 8/8
+- error only: 393 tok, solved 3/8, 131 tok/answer, 0.00s
+- --help: 464 tok, solved 4/8, 116 tok/answer, 0.04s
+- man (full): 26316 tok, solved 6/8, 4386 tok/answer, 0.78s
+- man|grep loose: 3173 tok, solved 5/8, 635 tok/answer, 0.78s
+- man|grep TIGHT: 870 tok, solved 6/8, 145 tok/answer, 0.78s
+- ladder A naive full man: 26316 tok, 6/8 solved, 8 calls, 0.78s
+- ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.41s
+- ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.42s
+- all fixes verified correct: True
