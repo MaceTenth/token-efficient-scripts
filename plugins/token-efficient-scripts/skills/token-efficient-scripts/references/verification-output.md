@@ -150,3 +150,22 @@ applicable scenarios: 10/10
 - total habit -> recommended: 30963 -> 893 tok (97.1%), 1.33s -> 1.28s
 - generic cuts that lost the answer (expected): clang++ template error (2 errors) ... | head -20; clang++ template error (2 errors) ... | tail -20
 - all recommended forms kept the answer: True
+
+---
+# /bench-verify run — 2026-11-02
+
+token counter: cl100k
+applicable scenarios: 10/10
+- pytest, 300 tests pass: 468 -> 2 tok (99.5%), answer kept: True, 0.287s -> 0.304s
+- pytest, 1 of 301 fails: 570 -> 49 tok (91.4%), answer kept: True, 0.297s -> 0.282s
+- pytest, 1 fails + 30 warnings: 2910 -> 63 tok (97.8%), answer kept: True, 0.297s -> 0.285s
+- clang++ template error (2 errors): 10860 -> 219 tok (97.9%), answer kept: True, 0.261s -> 0.208s
+- cargo build (3 type errors): 338 -> 102 tok (69.8%), answer kept: True, 0.051s -> 0.049s
+- git log, last 20 commits: 1383 -> 383 tok (72.3%), answer kept: True, 0.011s -> 0.013s
+- git: files in one commit: 850 -> 15 tok (98.2%), answer kept: True, 0.013s -> 0.012s
+- git: files changed in 10 commits: 6143 -> 60 tok (99.0%), answer kept: True, 0.015s -> 0.012s
+- unzip 400 files: 4172 -> 0 tok (100.0%), answer kept: True, 0.091s -> 0.088s
+- tar -x 400 files: 3303 -> 0 tok (100.0%), answer kept: True, 0.168s -> 0.157s
+- total habit -> recommended: 30997 -> 893 tok (97.1%), 1.49s -> 1.41s
+- generic cuts that lost the answer (expected): clang++ template error (2 errors) ... | head -20; clang++ template error (2 errors) ... | tail -20
+- all recommended forms kept the answer: True
