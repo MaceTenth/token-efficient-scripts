@@ -306,3 +306,34 @@ applicable scenarios: 8/8
 - ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.35s
 - ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.35s
 - all fixes verified correct: True
+
+---
+# /bench-recovery run — 2026-11-09
+
+token counter: chars/4 proxy
+applicable scenarios: 8/8
+- error only: 279 tok, solved 3/8, 93 tok/answer, 0.00s
+- --help: 333 tok, solved 4/8, 83 tok/answer, 0.02s
+- man (full): 27058 tok, solved 6/8, 4510 tok/answer, 0.63s
+- man|grep loose: 2977 tok, solved 5/8, 595 tok/answer, 0.63s
+- man|grep TIGHT: 809 tok, solved 6/8, 135 tok/answer, 0.64s
+- ladder A naive full man: 27058 tok, 6/8 solved, 8 calls, 0.63s
+- ladder B error/help/full man: 14628 tok, 6/8 solved, 9 calls, 0.33s
+- ladder C error/help/tight grep: 378 tok, 6/8 solved, 9 calls, 0.34s
+- all fixes verified correct: True
+
+- env note: unattended `python3` (/Library/Frameworks 3.13) still has no tiktoken, so this section used the chars/4 proxy and is not comparable with cl100k runs. Kept (append-only); the next section re-runs with `/opt/homebrew/bin/python3.14` (has tiktoken). Maintainer: put a tiktoken-capable `python3` first on PATH.
+---
+# /bench-recovery run — 2026-11-09
+
+token counter: cl100k
+applicable scenarios: 8/8
+- error only: 393 tok, solved 3/8, 131 tok/answer, 0.00s
+- --help: 464 tok, solved 4/8, 116 tok/answer, 0.03s
+- man (full): 26316 tok, solved 6/8, 4386 tok/answer, 0.65s
+- man|grep loose: 3173 tok, solved 5/8, 635 tok/answer, 0.65s
+- man|grep TIGHT: 870 tok, solved 6/8, 145 tok/answer, 0.63s
+- ladder A naive full man: 26316 tok, 6/8 solved, 8 calls, 0.65s
+- ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.34s
+- ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.33s
+- all fixes verified correct: True

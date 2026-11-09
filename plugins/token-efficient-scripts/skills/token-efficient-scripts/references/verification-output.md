@@ -169,3 +169,42 @@ applicable scenarios: 10/10
 - total habit -> recommended: 30997 -> 893 tok (97.1%), 1.49s -> 1.41s
 - generic cuts that lost the answer (expected): clang++ template error (2 errors) ... | head -20; clang++ template error (2 errors) ... | tail -20
 - all recommended forms kept the answer: True
+
+---
+# /bench-verify run — 2026-11-09
+
+token counter: chars/4 proxy
+applicable scenarios: 10/10
+- pytest, 300 tests pass: 689 -> 1 tok (99.8%), answer kept: True, 0.240s -> 0.236s
+- pytest, 1 of 301 fails: 799 -> 48 tok (93.9%), answer kept: True, 0.245s -> 0.243s
+- pytest, 1 fails + 30 warnings: 2332 -> 61 tok (97.3%), answer kept: True, 0.257s -> 0.245s
+- clang++ template error (2 errors): 9965 -> 197 tok (98.0%), answer kept: True, 0.181s -> 0.174s
+- cargo build (3 type errors): 268 -> 78 tok (70.8%), answer kept: True, 0.040s -> 0.039s
+- git log, last 20 commits: 817 -> 222 tok (72.8%), answer kept: True, 0.009s -> 0.009s
+- git: files in one commit: 427 -> 8 tok (98.1%), answer kept: True, 0.009s -> 0.008s
+- git: files changed in 10 commits: 2987 -> 30 tok (98.9%), answer kept: True, 0.010s -> 0.008s
+- unzip 400 files: 3937 -> 0 tok (100.0%), answer kept: True, 0.073s -> 0.071s
+- tar -x 400 files: 1860 -> 0 tok (100.0%), answer kept: True, 0.145s -> 0.134s
+- total habit -> recommended: 24081 -> 645 tok (97.3%), 1.21s -> 1.17s
+- generic cuts that lost the answer (expected): clang++ template error (2 errors) ... | head -20; clang++ template error (2 errors) ... | tail -20
+- all recommended forms kept the answer: True
+
+- env note: unattended `python3` (/Library/Frameworks 3.13) still has no tiktoken, so this section used the chars/4 proxy and is not comparable with cl100k runs. Kept (append-only); the next section re-runs with `/opt/homebrew/bin/python3.14` (has tiktoken). Maintainer: put a tiktoken-capable `python3` first on PATH.
+---
+# /bench-verify run — 2026-11-09
+
+token counter: cl100k
+applicable scenarios: 10/10
+- pytest, 300 tests pass: 466 -> 2 tok (99.5%), answer kept: True, 0.241s -> 0.236s
+- pytest, 1 of 301 fails: 568 -> 49 tok (91.3%), answer kept: True, 0.251s -> 0.246s
+- pytest, 1 fails + 30 warnings: 2848 -> 63 tok (97.7%), answer kept: True, 0.252s -> 0.267s
+- clang++ template error (2 errors): 10860 -> 219 tok (97.9%), answer kept: True, 0.217s -> 0.222s
+- cargo build (3 type errors): 336 -> 102 tok (69.6%), answer kept: True, 0.052s -> 0.050s
+- git log, last 20 commits: 1383 -> 383 tok (72.3%), answer kept: True, 0.013s -> 0.013s
+- git: files in one commit: 850 -> 15 tok (98.2%), answer kept: True, 0.014s -> 0.013s
+- git: files changed in 10 commits: 6143 -> 60 tok (99.0%), answer kept: True, 0.015s -> 0.013s
+- unzip 400 files: 4172 -> 0 tok (100.0%), answer kept: True, 0.085s -> 0.083s
+- tar -x 400 files: 3303 -> 0 tok (100.0%), answer kept: True, 0.154s -> 0.156s
+- total habit -> recommended: 30929 -> 893 tok (97.1%), 1.29s -> 1.30s
+- generic cuts that lost the answer (expected): clang++ template error (2 errors) ... | head -20; clang++ template error (2 errors) ... | tail -20
+- all recommended forms kept the answer: True
