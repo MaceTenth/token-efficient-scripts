@@ -352,3 +352,18 @@ applicable scenarios: 8/8
 - ladder B error/help/full man: 14183 tok, 6/8 solved, 9 calls, 0.39s
 - ladder C error/help/tight grep: 438 tok, 6/8 solved, 9 calls, 0.43s
 - all fixes verified correct: True
+
+---
+# /bench-recovery run — 2026-11-23
+
+token counter: chars/4 proxy
+applicable scenarios: 8/8
+- error only: 279 tok, solved 3/8, 93 tok/answer, 0.00s
+- --help: 333 tok, solved 4/8, 83 tok/answer, 0.03s
+- man (full): 27058 tok, solved 6/8, 4510 tok/answer, 0.80s
+- man|grep loose: 2977 tok, solved 5/8, 595 tok/answer, 0.80s
+- man|grep TIGHT: 809 tok, solved 6/8, 135 tok/answer, 0.79s
+- ladder A naive full man: 27058 tok, 6/8 solved, 8 calls, 0.80s
+- ladder B error/help/full man: 14628 tok, 6/8 solved, 9 calls, 0.42s
+- ladder C error/help/tight grep: 378 tok, 6/8 solved, 9 calls, 0.42s
+- all fixes verified correct: True
